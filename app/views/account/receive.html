@@ -40,6 +40,7 @@
 
           <h5>Address</h5>
 
+          <!-- Used addresses -->
           <div class="list-group address-list address-list-used"
                ng-show="usedAddresses.length">
             <a class="list-group-item"
@@ -53,20 +54,46 @@
             <hr>
           </div>
 
+          <!-- Fresh addresses -->
           <div class="list-group address-list">
             <div ng-repeat="address in addresses">
               <a class="list-group-item"
-                  ng-class="{ active: activeAddress.address === address.address }"
-                  ng-click="activate(address)">
-                <span class="address-list-address">{{address.address}}</span>
+                 ng-class="{
+                 invalid: address.invalid,
+                 active: activeAddress.address === address.address
+                 }"
+                 ng-click="activate(address)">
+
+                <span class="address-list-address"
+                      ng-if="!address.invalid"
+                      >{{address.address}}</span>
+                <span class="address-list-addresses text-danger"
+                      ng-if="address.invalid"
+                      >Invalid address! <strong>Contact TREZOR support.</strong></span>
+
+                <!-- Address verification -->
+                <span class="pull-right">
+                  <span class="glyphicon glyphicon-ok text-success"
+                        title="Address verified with TREZOR"
+                        ng-if="address.invalid === false"></span>
+                  <button class="btn btn-lg btn-link btn-verifyaddress"
+                          title="Verify with TREZOR"
+                          ng-if="
+                          device.isConnected() &&
+                          address.invalid === undefined &&
+                          activeAddress.address === address.address"
+                          ng-click="verify()">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+                  </button>
+                </span>
               </a>
               <div class="line-divider"
-                  ng-show="$first">
+                   ng-show="$first">
                 <hr>
                 <div class="line-divider-content text-center">
                   <button class="btn btn-xs btn-default"
-                      ng-disabled="addresses.length >= lookAhead"
-                      ng-click="more()">
+                          ng-disabled="addresses.length >= lookAhead"
+                          ng-click="more()">
                     More please
                     <span class="glyphicon glyphicon-plus"></span>
                   </button>

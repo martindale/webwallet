@@ -1,5 +1,5 @@
 angular.module('webwalletApp')
-  .controller('AccountReceiveCtrl', function ($document, $scope, $timeout) {
+  .controller('AccountReceiveCtrl', function (flash, $document, $scope, $timeout) {
     'use strict';
 
     $scope.activeAddress = null;
@@ -17,6 +17,20 @@ angular.module('webwalletApp')
         if (elem.length)
           selectRange(elem[0]);
       });
+    };
+
+    $scope.verify = function () {
+      var address = $scope.activeAddress;
+
+      $scope.device.verifyAddress(address.path, address.address)
+        .then(function (verified) {
+          address.invalid = !verified;
+          if (!verified) {
+            flash.error(
+              'Address verification failed! Please contact TREZOR support.'
+            );
+          }
+        });
     };
 
     $scope.more = function () {

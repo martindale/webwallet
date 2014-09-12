@@ -3,7 +3,7 @@
 angular.module('webwalletApp')
   .factory('TrezorDevice', function (
       config, trezor, utils, firmwareService, TrezorAccount,
-      BigInteger, _, $q) {
+      BigInteger, _, $q, $log) {
 
     function TrezorDevice(id) {
       this.id = ''+id;
@@ -474,6 +474,26 @@ angular.module('webwalletApp')
         for (i = 2; i <= n; i++) nf *= i;
         return nf;
       }
+    };
+
+    TrezorDevice.prototype.verifyAddress = function (path, address) {
+      var self = this;
+
+      // TODO: use coin of proper account
+      return self._session.getAddress(path, self.defaultCoin(), true)
+        .then(function (res) {
+          var verified = res.message.address === address;
+
+          if (!verified) {
+            $log.error('[device] Address verification failed', {
+              path: path,
+              jsAddress: address,
+              trezorAddress: res.message.address
+            });
+          }
+
+          return verified;
+        });
     };
 
     return TrezorDevice;

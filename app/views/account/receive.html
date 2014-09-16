@@ -73,14 +73,14 @@
 
                 <!-- Address verification -->
                 <span class="pull-right">
-                  <span class="glyphicon glyphicon-ok text-success"
-                        title="Address verified with TREZOR"
-                        ng-if="address.invalid === false"></span>
+                  <span class="icon-loading"
+                        title="Verifying address with TREZOR"
+                        ng-if="address.verification"></span>
                   <button class="btn btn-lg btn-link btn-verifyaddress"
                           title="Verify with TREZOR"
                           ng-if="
+                          !address.verification &&
                           device.isConnected() &&
-                          address.invalid === undefined &&
                           activeAddress.address === address.address"
                           ng-click="verify()">
                     <span class="glyphicon glyphicon-eye-open"></span>

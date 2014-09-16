@@ -379,15 +379,8 @@ angular.module('webwalletApp')
         return;
       }
 
-      if (code === 'ButtonRequest_FeeOverThreshold') {
-        promptButton(code);
-      } else if (code === 'ButtonRequest_ConfirmOutput') {
-        promptButton(code);
-      } else if (code === 'ButtonRequest_SignTx') {
-        promptButton(code);
-      } else if (code === 'ButtonRequest_WipeDevice') {
-        promptButton(code);
-      } else if (code !== 'ButtonRequest_ConfirmWord') {
+      if (code !== 'ButtonRequest_ConfirmWord' &&
+          code !== 'ButtonRequest_Address') {
         promptButton(code);
       }
     }

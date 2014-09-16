@@ -22,15 +22,20 @@ angular.module('webwalletApp')
     $scope.verify = function () {
       var address = $scope.activeAddress;
 
+      address.verification = true;
       $scope.device.verifyAddress(address.path, address.address)
-        .then(function (verified) {
-          address.invalid = !verified;
-          if (!verified) {
-            flash.error(
-              'Address verification failed! Please contact TREZOR support.'
-            );
-          }
-        });
+        .then(
+          function (verified) {
+            address.verification = false;
+            if (!verified) {
+              flash.error(
+                'Address verification failed! Please contact TREZOR support.'
+              );
+            }
+          },
+          function () {
+            address.verification = false;
+          });
     };
 
     $scope.more = function () {

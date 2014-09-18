@@ -33,8 +33,9 @@ angular.module('webwalletApp')
               );
             }
           },
-          function () {
+          function (err) {
             address.verification = false;
+            flash.error(err.message || 'Address verification failed');
           });
     };
 

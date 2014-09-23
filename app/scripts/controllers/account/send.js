@@ -2,7 +2,7 @@
 
 angular.module('webwalletApp')
   .controller('AccountSendCtrl', function (
-    flash, temporaryStorage, utils, config, trezorService,
+    flash, temporaryStorage, utils, config, deviceList,
     $filter, $scope, $rootScope, $routeParams) {
     'use strict';
 
@@ -319,8 +319,8 @@ angular.module('webwalletApp')
       var currentDevice = $scope.device,
           currentAccount = $scope.account,
           suggestedAccounts = [],
-          multipleDevices = trezorService.devices.length > 1;
-      trezorService.devices.forEach(function (dev) {
+          multipleDevices = deviceList.count() > 1;
+      deviceList.all().forEach(function (dev) {
           dev.accounts.forEach(function (acc) {
             if (dev.id === currentDevice.id &&
                 acc.id === currentAccount.id) {

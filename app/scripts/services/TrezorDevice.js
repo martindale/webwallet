@@ -1,8 +1,9 @@
+/*global angular*/
+
 'use strict';
 
 angular.module('webwalletApp')
-  .factory('TrezorDevice', function (
-      config, trezor, utils, firmwareService, TrezorAccount,
+  .factory('TrezorDevice', function (config, utils, TrezorAccount,
       BigInteger, _, $q) {
 
     function TrezorDevice(id) {
@@ -13,11 +14,45 @@ angular.module('webwalletApp')
 
       this._passphrase = null;
       this._session = null;
+      this._desc = null;
       this._statusLabel = null;
       this._loadingLevel = 0;
 
       this._DEFAULT_LABEL = 'My TREZOR';
     }
+
+    TrezorDevice.EVENT_PIN = 'pin';
+    TrezorDevice.EVENT_BUTTON = 'button';
+    TrezorDevice.EVENT_PASSPHRASE = 'passphrase';
+    TrezorDevice.EVENT_WORD = 'word';
+    TrezorDevice.EVENT_SEND = 'send';
+    TrezorDevice.EVENT_ERROR = 'error';
+    TrezorDevice.EVENT_RECEIVE = 'receive';
+
+    TrezorDevice.EVENT_CONNECT = 'connect';
+    TrezorDevice.EVENT_DISCONNECT = 'disconnect';
+
+    TrezorDevice.EVENT_PREFIX = 'device.';
+    TrezorDevice.EVENT_TYPES = [
+      TrezorDevice.EVENT_PIN,
+      TrezorDevice.EVENT_PASSPHRASE,
+      TrezorDevice.EVENT_BUTTON,
+      TrezorDevice.EVENT_WORD,
+      TrezorDevice.EVENT_SEND,
+      TrezorDevice.EVENT_ERROR,
+      TrezorDevice.EVENT_RECEIVE
+    ];
+
+    TrezorDevice.REQ_BUTTON_FIRMWARE = 'ButtonRequest_FirmwareCheck';
+
+    /**
+     * Disconnect the device and unsubscribe from account updates from the
+     * server backend.
+     */
+    TrezorDevice.prototype.destroy = function () {
+        this.disconnect();
+        this.unsubscribe();
+    };
 
     TrezorDevice.deserialize = function (data) {
       var dev = new TrezorDevice(data.id);
@@ -216,6 +251,12 @@ angular.module('webwalletApp')
         return acc.subscribe();
       }));
     };
+
+    /**
+     * Initialize the device -- subscribe to account updates from the
+     * server backend.
+     */
+    TrezorDevice.prototype.init = TrezorDevice.prototype.subscribe;
 
     TrezorDevice.prototype.unsubscribe = function () {
       return $q.all(this.accounts.map(function (acc) {

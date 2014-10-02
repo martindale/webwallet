@@ -12,7 +12,9 @@ angular.module('webwalletApp')
 
         'use strict';
 
-        $scope.devices = deviceList.all();
+        $scope.devices = function () {
+            return deviceList.all();
+        };
 
         $scope.isActive = function (path) {
             return $location.path().match(path);

@@ -22,11 +22,11 @@
     </div>
     <![endif]-->
 
-    <div class="page-header navbar navbar-inverse navbar-static-top">
+    <div class="page-header navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="/">
-            <img src="images/logo.png" height="45" alt="myTREZOR Web Wallet">
+            <img src="images/logo.png" height="40" alt="myTREZOR Web Wallet">
           </a>
         </div>
         <ul class="nav navbar-nav navbar-right">
@@ -91,7 +91,7 @@
         <div class="page-container container">
           <div class="row">
             <!-- Navigations -->
-            <div class="col-md-3"
+            <div class="col-md-3 page-left"
               ng-include="'views/nav.html'">
             </div>
 
@@ -123,16 +123,18 @@
         </div>
       </div>
 
-      <div class="page-footer container">
-        Copyright &copy; 2014
-        <a href="http://satoshilabs.com/" target="_blank">SatoshiLabs</a> |
-        Backend powered by
-        <a href="https://bitsofproof.com/?page_id=826" target="_blank"
-           ><img src="/images/bitsofproof.png" height="24" alt="Bits of Proof"></a>
+      <div class="page-footer">
+        <div class="container">
+          Copyright &copy; 2014
+          <a href="http://satoshilabs.com/" target="_blank">SatoshiLabs</a> |
+          Backend powered by
+          <a href="https://bitsofproof.com/?page_id=826" target="_blank"
+              ><img src="/images/bitsofproof.png" height="24" alt="Bits of Proof"></a>
 
-        <span class="pull-right">
-          <ng-include src="'views/debug.link.html'"></ng-include>
-        </span>
+          <span class="pull-right">
+              <ng-include src="'views/debug.link.html'"></ng-include>
+          </span>
+        </div>
       </div>
     </div>
 

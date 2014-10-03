@@ -2,82 +2,102 @@
   <!-- Device -->
   <li ng-repeat="device in devices"
       ng-class="{ disabled: device.isLoading() }">
-    <a ng-href="#/device/{{device.id}}"
-       ng-class="{ active: isActive('/device/{{device.id}}$') }">
-      <h4>
-        {{device.label()}}
-        <span class="pull-right dev-status-icon icon-loading" title="Loading..."
+      <div class="nav-device"
+          ng-class="{ active: isActive('/device/{{device.id}}') }">
+        <h4>
+          <a ng-href="#/device/{{device.id}}">{{device.label()}}</a>
+          <span class="dev-status-icon icon-loading"
+              tooltip="Loading..."
               ng-show="device.isLoading()"></span>
-      </h4>
-
-      <small class="dev-status">
-        <span class="dev-status-{{device.status()}}"
-              ng-switch="device.status()">
-          <span ng-switch-when="loading">
-            <span class="glyphicon glyphicon-cog"></span>
-            {{device.statusLabel() || 'Loading'}}&hellip;
-          </span>
-          <span ng-switch-when="connected">
-            <span class="glyphicon glyphicon-check"></span>
-            {{device.statusLabel() || 'Connected'}}
-          </span>
-          <span ng-switch-when="disconnected">
-            <span class="glyphicon glyphicon-unchecked"></span>
-            {{device.statusLabel() || 'Disconnected'}}
-          </span>
-        </span>
-      </small>
-    </a>
-
-    <div class="dev-blocked tooltip tooltip-danger in right"
-         ng-show="device.error">
-      <div class="tooltip-inner"
-           ng-switch="device.error">
-        <span ng-switch-when="Opening device failed">
-          Device could not be opened. Make sure you don't have myTREZOR running in another tab or browser window!
-        </span>
-        <span ng-switch-default>{{device.error}}</span>
-      </div>
-      <div class="tooltip-arrow"></div>
-    </div>
-
-    <ul class="nav nav-devices-accounts">
-      <!-- Account -->
-      <li ng-repeat="account in device.accounts"
-          ng-class="{ disabled: account.balance == null }">
-        <a ng-href="{{ accountLink(device, account)}}"
-           ng-class="{ active: isActive('/device/{{device.id}}/account/{{account.id}}') }"
-          >{{account.label()}}
-          <small class="dev-acc-info">
-            <span ng-if="account.balance != null">
-              ({{account.balance | amount}} {{account.coin.coin_shortcut}})
+          <span class="dev-forget"
+              ng-show="!device.isLoading()">
+            <span ng-controller="DeviceCtrl">
+              <a href=""
+                  ng-click="forgetDevice()"
+                  tooltip="Forget this device"
+                  tooltip-append-to-body="true">
+                &times;
+                <span class="sr-only">Forget device<span>
+              </a>
             </span>
-            <span ng-if="account.balance == null">
-              <span class="icon-loading" title="Loading&hellip;"></span>
+          </span>
+        </h4>
+
+
+        <small class="dev-status">
+          <span class="dev-status-{{device.status()}}"
+                ng-switch="device.status()">
+            <span ng-switch-when="loading">
+              <span class="glyphicon glyphicon-cog"></span>
+              {{device.statusLabel() || 'Loading'}}&hellip;
             </span>
-          </small>
-        </a>
-      </li>
-    </ul>
+            <!--
+            <span ng-switch-when="connected">
+              <span class="glyphicon glyphicon-check"></span>
+              {{device.statusLabel() || 'Connected'}}
+            </span>
+            -->
+            <span ng-switch-when="disconnected">
+              <span class="glyphicon glyphicon-unchecked"></span>
+              {{device.statusLabel() || 'Disconnected'}}
+            </span>
+          </span>
+        </small>
 
-    <div ng-if="!device.isEmpty()">
-      <div ng-if="!device.canAddAccount()"
-           tooltip="
-             To add accounts, make sure your device is connected
-             and the last account is not empty."
-           tooltip-placement="bottom">
-        <a ng-href="" class="btn btn-sm"
-           disabled
-          ><span class="glyphicon glyphicon-plus"></span> Add account</a>
-      </div>
+        <div class="dev-blocked tooltip tooltip-danger in right"
+             ng-show="device.error">
+          <div class="tooltip-inner"
+               ng-switch="device.error">
+            <span ng-switch-when="Opening device failed">
+              Device could not be opened. Make sure you don't have myTREZOR running in another tab or browser window!
+            </span>
+            <span ng-switch-default>{{device.error}}</span>
+          </div>
+          <div class="tooltip-arrow"></div>
+        </div>
 
-      <div ng-if="device.canAddAccount()">
-        <a ng-href="" class="btn btn-sm"
-           ng-click="addAccount(device)"
-          ><span class="glyphicon glyphicon-plus"></span> Add account</a>
-      </div>
+        <ul class="nav nav-devices-accounts">
+          <!-- Account -->
+          <li ng-repeat="account in device.accounts"
+              ng-class="{ disabled: account.balance == null }">
+            <a ng-href="{{ accountLink(device, account)}}"
+               ng-class="{ active: isActive('/device/{{device.id}}/account/{{account.id}}') }"
+              >{{account.label()}}
+              <small class="dev-acc-info">
+                <span ng-if="account.balance != null">
+                  ({{account.balance | amount}} {{account.coin.coin_shortcut}})
+                </span>
+                <span ng-if="account.balance == null">
+                  <span class="icon-loading" title="Loading&hellip;"></span>
+                </span>
+              </small>
+            </a>
+          </li>
+        </ul>
+
+        <div ng-if="!device.isEmpty()">
+          <div ng-if="!device.canAddAccount()">
+            <div class="nav-devices-accounts-add"
+                tooltip="
+                  To add accounts, make sure your device is connected
+                  and the last account is not empty."
+                tooltip-placement="bottom">
+              <a ng-href="" class="btn btn-sm" disabled>
+                <span class="glyphicon glyphicon-plus"></span> Add account
+              </a>
+            </div>
+          </div>
+
+          <div ng-if="device.canAddAccount()">
+            <div class="nav-devices-accounts-add"
+              <a ng-href="" class="btn btn-sm"
+                ng-click="addAccount(device)">
+                <span class="glyphicon glyphicon-plus"></span> Add account</a>
+            </div>
+          </div>
+        </div>
+
+        <hr ng-hide="$last">
     </div>
-
-    <hr ng-hide="$last">
   </li>
 </ul>

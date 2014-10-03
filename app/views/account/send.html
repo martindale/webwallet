@@ -22,6 +22,42 @@
         <div class="tab-content tx-send">
           <fieldset ng-disabled="!device.isConnected()"
               class="overlay-container">
+
+            <div class="tab-actions">
+              <div class="row">
+                <div class="col-md-6">
+                  <a href=""
+                    class="btn btn-link btn-sm"
+                    ng-disabled="qr.scanning"
+                    ng-click="addOutput()">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Add recipient
+                  </a>
+                </div>
+                <div class="col-md-6 text-right">
+                  <a href="#/device/{{device.id}}/account/{{account.id}}"
+                      class="btn btn-link btn-sm"
+                      ng-click="cancelTxValues()">
+                    Cancel transaction
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </a>
+                  <a href="javascript:void(0)"
+                      class="btn btn-link btn-sm"
+                      ng-click="removeAllOutputs()"
+                      ng-show="tx.values.outputs.length > 1">
+                    Remove all
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </a>
+                  <a href="javascript:void(0)"
+                      class="btn btn-link btn-sm"
+                      ng-click="importCsv()">
+                    Import CSV
+                    <span class="glyphicon glyphicon-import"></span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
             <div class="row tx-output"
                 ng-repeat="output in tx.values.outputs">
               <div class="col-md-8" ng-class="{ 'has-error': output.error.address }">
@@ -80,41 +116,6 @@
               </div>
             </div>
 
-            <div class="tx-output-add">
-              <div class="row">
-                <div class="col-md-6">
-                  <a href=""
-                    class="btn btn-link"
-                    ng-disabled="qr.scanning"
-                    ng-click="addOutput()">
-                    <span class="glyphicon glyphicon-plus"></span>
-                    Add recipient
-                  </a>
-                </div>
-                <div class="col-md-6 text-right">
-                  <a href="#/device/{{device.id}}/account/{{account.id}}"
-                      class="btn btn-link btn-sm"
-                      ng-click="cancelTxValues()">
-                    Cancel transaction
-                    <span class="glyphicon glyphicon-remove"></span>
-                  </a>
-                  <a href="javascript:void(0)"
-                      class="btn btn-link btn-sm"
-                      ng-click="removeAllOutputs()"
-                      ng-show="tx.values.outputs.length > 1">
-                    Remove all
-                    <span class="glyphicon glyphicon-remove"></span>
-                  </a>
-                  <a href="javascript:void(0)"
-                      class="btn btn-link btn-sm"
-                      ng-click="importCsv()">
-                    Import CSV
-                    <span class="glyphicon glyphicon-import"></span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
             <div class="overlay overlay-default"
                  ng-if="sending">
               <div class="overlay-content text-center">
@@ -140,7 +141,7 @@
                 }}"
                 tooltip-placement="bottom">
             <button type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-lg"
                     ng-disabled="device.status() !== 'connected' || !tx.prepared ">
               Send
               <span class="glyphicon glyphicon-chevron-right"></span>
@@ -162,7 +163,7 @@
               ng-disabled="!tx.prepared"
               ng-click="advanced = !advanced">
             Advanced details
-            <span class="glyphicon glyphicon-plus"></span>
+            <span class="caret"></span>
           </button>
         </div>
       </div>

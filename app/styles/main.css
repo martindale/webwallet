@@ -758,6 +758,10 @@ body {
   padding-bottom: 1em;
   background: transparent;
 }
+.nav-device a,
+.nav-device .btn {
+  color: #333;
+}
 .nav-device .disabled a,
 .nav-device .btn[disabled] {
   color: #666 !important;
@@ -769,13 +773,6 @@ body {
 }
 .nav-device h4 a {
   color: #333;
-}
-.nav-device h4 a:hover,
-.nav-device h4 a:focus,
-.nav-device h4 a:active {
-  color: #333;
-  text-decoration: underline;
-  outline: 0;
 }
 .dev-status-icon,
 .dev-forget {
@@ -821,23 +818,15 @@ body {
   padding: 0.5em 0;
   color: #333;
 }
-.nav-devices-accounts li a:hover,
-.nav-devices-accounts li a:focus,
-.nav-devices-accounts li a:active,
-.nav-devices-accounts li a.active {
-  background: transparent;
-  text-decoration: underline;
-  outline: 0;
-}
 
 .nav-devices-accounts-add {
   display: inline-block;
   margin: 0.5em 0;
 }
 .nav-devices-accounts-add .btn {
-  text-align: left;
-  padding: 0;
   margin-left: 1em;
+  padding: 0;
+  text-align: left;
 }
 
 .nav-device hr {
@@ -848,6 +837,22 @@ body {
 .nav-device.active hr {
   margin: 0;
   visibility: hidden;
+}
+
+.nav-device h4 a:hover,
+.nav-device h4 a:focus,
+.nav-device h4 a:active,
+.nav-devices-accounts li a:hover,
+.nav-devices-accounts li a:focus,
+.nav-devices-accounts li a:active,
+.nav-devices-accounts li a.active,
+.nav-devices-accounts-add .btn:hover,
+.nav-devices-accounts-add .btn:focus,
+.nav-devices-accounts-add .btn:active {
+  color: #333;
+  background: transparent;
+  text-decoration: underline;
+  outline: 0;
 }
 
 .page-left {

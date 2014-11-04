@@ -39,7 +39,7 @@
                        ng-click="scanQr($index)"
                        ng-show="!output.address && !qr.scanning && qr.enabled"></a>
                   </span>
-                  <span class="help-block">
+                  <span class="help-block" ng-if="output.error.address">
                     {{output.error.address}}
                   </span>
                 </div>
@@ -90,6 +90,18 @@
                   <span class="help-block" ng-if="output.error.amount">
                     {{output.error.amount}}
                   </span>
+                </div>
+              </div>
+
+              <!-- Label -->
+              <div class="form-group"
+                   ng-class="{'has-error': output.error.label}">
+                <label for="label" class="control-label col-sm-2">Label</label>
+                <div class="col-sm-10 tx-label">
+                  <input id="label" class="form-control" type="text"
+                    ng-model="output.label"
+                    placeholder="Give your own label to this address"
+                    required>
                 </div>
               </div>
 

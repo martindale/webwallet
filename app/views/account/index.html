@@ -21,7 +21,10 @@
         </thead>
         <tbody>
           <tr class="txlist-tx"
-              ng-repeat="tx in account.transactions">
+              ng-repeat="tx in account.transactions"
+              ng-class="{ 'selected': tx.active }"
+              tooltip="Click to see transaction details and to edit the label."
+              ng-click="tx.active = !tx.active">
             <td class="txlist-date"
                 ng-if="tx.block">
               {{tx.timestamp | date:'yyyy-MM-dd'}}
@@ -32,30 +35,73 @@
               <small title="Transaction received at {{tx.timestamp | date:'yyyy-MM-dd HH:mm:ss'}}"
                 >Unconfirmed</small>
             </td>
-            <td class="txlist-comment"
-                ng-if="tx.comment">
-              "{{tx.comment}}"
-            </td>
-            <td class="txlist-address"
-                ng-if="!tx.comment"
+            <td ng-if="!tx.active"
                 ng-switch="tx.analysis.type">
-              <a href="{{blockExplorer.urlTx}}{{tx.hash}}"
-                 class="txlist-hash"
-                 target="_blank"
-                 title="Transaction info at {{blockExplorer.name}}"
-                 ><span class="glyphicon glyphicon-info-sign"></span></a>
-              <span class="text-success" ng-switch-when="recv">
-                <span class="glyphicon glyphicon-circle-arrow-right" title="Received"></span> {{tx.analysis.addr.toString()}}
-              </span>
-              <span class="text-danger" ng-switch-when="sent">
-                <span class="glyphicon glyphicon-circle-arrow-left" title="Sent"></span> {{tx.analysis.addr.toString()}}
-              </span>
-              <span class="text-warning" ng-switch-when="self">
-                <span class="glyphicon glyphicon-user"></span> Sent to myself
-              </span>
-              <span class="text-muted" ng-switch-default>
-                <span class="glyphicon glyphicon-question-sign"></span> Unknown
-              </span>
+              <div class="txlist-address">
+                <a href="{{blockExplorer.urlTx}}{{tx.hash}}"
+                   class="txlist-hash"
+                   target="_blank"
+                   title="Transaction info at {{blockExplorer.name}}"
+                   ><span class="glyphicon glyphicon-info-sign"></span></a>
+                <span class="text-success" ng-switch-when="recv">
+                  <span class="glyphicon glyphicon-circle-arrow-right"
+                    title="Received"></span>
+                  <span ng-if="tx.label" title="{{tx.analysis.addr.toString()}}">
+                    {{tx.label}}
+                  </span>
+                  <span ng-if="!tx.label">
+                    {{tx.analysis.addr.toString()}}
+                  </span>
+                </span>
+                <span class="text-danger" ng-switch-when="sent">
+                  <span class="glyphicon glyphicon-circle-arrow-left"
+                    title="Sent"></span>
+                  <span ng-if="tx.label" title="{{tx.analysis.addr.toString()}}">
+                    {{tx.label}}
+                  </span>
+                  <span ng-if="!tx.label">
+                    {{tx.analysis.addr.toString()}}
+                  </span>
+                </span>
+                <span class="text-warning" ng-switch-when="self">
+                  <span class="glyphicon glyphicon-user"></span> Sent to myself
+                </span>
+                <span class="text-muted" ng-switch-default>
+                  <span class="glyphicon glyphicon-question-sign"></span> Unknown
+                </span>
+              </div>
+            </td>
+            <td ng-if="tx.active"
+                ng-switch="tx.analysis.type">
+              <div class="txlist-address">
+                <a href="{{blockExplorer.urlTx}}{{tx.hash}}"
+                   class="txlist-hash"
+                   target="_blank"
+                   title="Transaction info at {{blockExplorer.name}}"
+                   ><span class="glyphicon glyphicon-info-sign"></span></a>
+                <span class="text-success" ng-switch-when="recv">
+                  <span class="glyphicon glyphicon-circle-arrow-right"
+                    title="Received"></span>
+                  {{tx.analysis.addr.toString()}}
+                </span>
+                <span class="text-danger" ng-switch-when="sent">
+                  <span class="glyphicon glyphicon-circle-arrow-left"
+                    title="Sent"></span>
+                  {{tx.analysis.addr.toString()}}
+                </span>
+                <span class="text-warning" ng-switch-when="self">
+                  <span class="glyphicon glyphicon-user"></span> Sent to myself
+                </span>
+                <span class="text-muted" ng-switch-default>
+                  <span class="glyphicon glyphicon-question-sign"></span> Unknown
+                </span>
+              </div>
+              <form role="form" class="txlist-label"
+                ng-submit="">
+                <input type="text" class="form-control"
+                  placeholder="Give your own label to this address"
+                  ng-model="tx.label">
+              </form>
             </td>
             <td class="txlist-amount"
                 ng-class="{ 'text-success': tx.analysis.impact.sign > 0,

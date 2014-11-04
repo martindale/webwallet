@@ -8,7 +8,7 @@
 
     <ng-include src="'views/account/nav.html'"></ng-include>
 
-    <div class="tab-content">
+    <div class="tab-content receive">
       <div ng-if="account.transactions === null"
            class="text-center text-muted">
         <h4>Waiting for transaction history&hellip;</h4>
@@ -19,55 +19,62 @@
 
         <div class="col-md-8">
 
-          <button class="address-list-toggleused btn btn-sm btn-link pull-right"
-                  ng-show="!usedAddresses.length && account.transactions.length"
-                  ng-click="usedAddresses = account.usedAddresses()">
-            <span class="glyphicon glyphicon-chevron-up"></span> Show used
-          </button>
-
-          <button class="address-list-toggleused btn btn-sm btn-link pull-right"
-                  ng-show="usedAddresses.length && account.transactions.length"
-                  ng-click="usedAddresses = []">
-            <span class="glyphicon glyphicon-chevron-down"></span> Hide used
-          </button>
-
-          <h5>Address</h5>
-
-          <div class="list-group address-list address-list-used"
+          <div class="receive-bar"
+              ng-show="!usedAddresses.length && account.transactions.length">
+            <button class="address-list-toggleused btn btn-sm btn-link pull-right"
+                ng-click="usedAddresses = account.usedAddresses()">
+              <span class="glyphicon glyphicon-chevron-up"></span> Show used
+            </button>
+            <h4>
+              Fresh address
+            </h4>
+          </div>
+          <div class="receive-bar"
+              ng-show="usedAddresses.length && account.transactions.length">
+            <button class="address-list-toggleused btn btn-sm btn-link pull-right"
+                ng-click="usedAddresses = []">
+              <span class="glyphicon glyphicon-chevron-down"></span> Hide used
+            </button>
+            <h4>
+              Used addresses
+            </h4>
+          </div>
+          <div class="list-group receive-addresses receive-used"
                ng-show="usedAddresses.length">
             <a class="list-group-item"
                ng-repeat="address in usedAddresses"
                ng-class="{ active: activeAddress.address === address.address }"
                ng-click="activate(address)">
-              <span class="address-list-index"
-                    >/{{address.path[address.path.length-1]}}</span>
-              <span class="address-list-address">{{address.address}}</span>
-              <small class="address-list-balance text-success pull-right"
+              {{address.address}}
+              <em>/{{address.path[address.path.length-1]}}</em>
+              <small class="text-success pull-right"
                 >({{address.balance | amount}} {{account.coin.coin_shortcut}})</small>
             </a>
-            <hr>
           </div>
 
-          <div class="list-group address-list">
+          <div class="list-group receive-addresses">
             <div ng-repeat="address in addresses">
-              <a class="list-group-item"
-                  ng-class="{ active: activeAddress.address === address.address }"
-                  ng-click="activate(address)">
-                <span class="address-list-index"
-                      >/{{address.path[address.path.length-1]}}</span>
-                <span class="address-list-address">{{address.address}}</span>
-              </a>
-              <div class="line-divider"
-                  ng-show="$first">
-                <hr>
-                <div class="line-divider-content text-center">
-                  <button class="btn btn-xs btn-default"
-                      ng-disabled="addresses.length >= lookAhead"
-                      ng-click="more()">
-                    More please
-                    <span class="glyphicon glyphicon-plus"></span>
-                  </button>
-                </div>
+              <h4 ng-show="$first && usedAddresses.length && account.transactions.length">
+                Fresh address
+              </h4>
+              <div class="clearfix">
+                <a class="list-group-item receive-address"
+                    ng-class="{ active: activeAddress.address === address.address }"
+                    ng-click="activate(address)">
+                  {{address.address}}
+                  <em>/{{address.path[address.path.length-1]}}</em>
+                </a>
+                <input type="text" class="form-control receive-label"
+                  placeholder="Address label"
+                  ng-model="tx.label">
+              </div>
+              <div ng-show="$first" class="receive-more">
+                <a href="" class="btn btn-default btn-sm"
+                  ng-disabled="addresses.length >= lookAhead"
+                  ng-click="more()">
+                  <span class="glyphicon glyphicon-plus"></span>
+                  More please
+                </a>
               </div>
             </div>
           </div>
@@ -80,11 +87,9 @@
           </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-4 receive-side">
           <div>
-            <h5>QR Code</h5>
-
-            <a class="address-qr-link"
+            <a class="receive-qr"
                href="{{blockExplorer.urlAddress}}{{activeAddress.address}}"
                target="_blank" title="Address info at {{blockExplorer.name}}">
               <qr size="210" text="'bitcoin:' + activeAddress.address"></qr>
@@ -92,8 +97,6 @@
           </div>
 
           <div ng-if="activeAddress">
-            <h5>Details</h5>
-
             <ul class="list-unstyled">
               <li ng-if="activeAddress.path">
                 <span class="h6">BIP32 Path:</span>

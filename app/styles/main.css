@@ -383,42 +383,50 @@ body {
 
 /* Transaction list */
 
+/* Empty */
 .txlist-loading,
 .txlist-empty {
   margin-top: 50px;
 }
 
+/* Head */
 .txlist thead th {
   font-size: 85%;
   font-weight: normal;
   border-bottom: none !important;
   padding: 4px 8px !important;
 }
-
 .txlist thead th.txlist-header-address {
   padding-left: 30px !important;
 }
-
 .txlist thead th.txlist-header-amount {
   padding-left: 16px !important;
 }
 
+/* Body */
+.txlist-tx {
+  cursor: pointer;
+}
 .txlist-address,
 .txlist-amount,
 .txlist-balance {
   font-family: monospace;
 }
 
+/* Info */
 .txlist-hash .glyphicon {
   display: none;
 }
-
 .txlist-tx:hover .txlist-hash .glyphicon {
   display: inline-block;
 }
-
 .txlist-tx:hover .glyphicon {
-    display: none;
+  display: none;
+}
+
+/* Form */
+.txlist-label {
+  margin-top: 0.5em;
 }
 
 /* Device send/receive nav */
@@ -440,46 +448,72 @@ body {
 
 /* Receive */
 
-.address-list .badge {
-  opacity: 0.5;
+.receive {
+  padding-top: 1.5em;
+}
+.receive-bar {
+  height: 2.2em;
+}
+.receive-bar .pull-right {
+  margin-top: -2px;
+  margin-right: -4px;
+}
+.receive-address,
+.receive-label {
+  display: block;
+  float: left;
+  overflow: hidden;
+  width: 25em;
+  height: auto;
+  padding: 0.5em 1em;
+  line-height: 1.5;
+}
+.receive-label {
+  width: auto;
+}
+.receive-more {
+  /* text-align: center; */
+  padding: 0.7em 0;
+}
+.receive-unused {
+  padding-bottom: 0.7em;
 }
 
-.address-list .list-group-item.active {
+/* Addresses */
+.receive-addresses {
+  clear: both;
+}
+.receive-address.active {
   color: hsl(208, 40%, 43%);
   background-color: hsla(208, 56%, 53%, 0.1);
   border-color: hsla(208, 56%, 53%, 0.4);
 }
-
-.address-list .list-group-item.active:hover {
+.receive-address.active:hover {
   color: hsl(208, 40%, 43%);
   background-color: hsla(208, 56%, 53%, 0.2);
   border-color: hsla(208, 56%, 53%, 0.5);
 }
-
-.address-list-toggleused {
-  padding-top: 8px;
-  padding-right: 1px;
-}
-
-.address-list-index {
-  margin-bottom: -2px;
-  margin-right: 6px;
+.receive-addresses em {
+  padding-left: 0.5em;
   opacity: 0.2;
-  line-height: 1;
 }
 
-.address-qr-link {
+/* QR */
+.receive-side {
+  padding-top: 3em;
+}
+.receive-qr {
   display: inline-block;
   margin-top: -4px;
   margin-left: -4px;
   border: 4px solid transparent;
 }
-.address-qr-link:hover,
-.address-qr-link:focus,
-.address-qr-link:active {
+.receive-qr:hover,
+.receive-qr:focus,
+.receive-qr:active {
   border-color: #428BCA;
 }
-.address-qr-link canvas {
+.receive-qr canvas {
   display: block;
 }
 
@@ -653,7 +687,8 @@ body {
   margin-top: 10px;
   margin-left: 15px;
 }
-.tx-output .input-with-icon {
+.tx-output .input-with-icon,
+.tx-label input {
   max-width: 26.5em;
 }
 

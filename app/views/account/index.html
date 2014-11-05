@@ -8,7 +8,8 @@
 
     <ng-include src="'views/account/nav.html'"></ng-include>
 
-    <div class="tab-content">
+    <div class="tab-content"
+        ng-controller="AccountTransactionsCtrl">
       <table class="txlist table table-hover"
              ng-show="account.transactions != null && account.transactions.length">
         <thead>
@@ -96,12 +97,12 @@
                   <span class="glyphicon glyphicon-question-sign"></span> Unknown
                 </span>
               </div>
-              <form role="form" class="txlist-label"
-                ng-submit="">
+              <form role="form" class="txlist-label">
                 <input type="text" class="form-control"
                   placeholder="Give your own label to this address"
-                  ng-model="tx.label"
-                  ng-click="$event.stopPropagation()">
+                  ng-model="tx._label"
+                  ng-click="$event.stopPropagation()"
+                  ng-change="saveAddressLabel(tx)">
               </form>
             </td>
             <td class="txlist-amount"

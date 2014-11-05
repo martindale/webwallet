@@ -55,7 +55,7 @@ angular.module('webwalletApp').factory('deviceList', function (
     }
 
     DeviceList.prototype.STORAGE_DEVICES = 'trezorDevices';
-    DeviceList.prototype.STORAGE_VERSION = 'trezorVersion';
+    DeviceList.prototype.STORAGE_DEVICES_VERSION = 'trezorVersion';
     DeviceList.prototype.POLLING_PERIOD = 1000;
 
     DeviceList.prototype.DEFAULT_HOOK_PRIORITY = 50;
@@ -66,12 +66,12 @@ angular.module('webwalletApp').factory('deviceList', function (
      */
     DeviceList.prototype._restore = function () {
         // Initialize the device storage
-        this._storage = new ItemStorage({
-            type: TrezorDevice,
-            version: config.storageVersion,
-            keyItems: this.STORAGE_DEVICES,
-            keyVersion: this.STORAGE_VERSION
-        });
+        this._storage = new ItemStorage(
+            config.storageVersion,
+            this.STORAGE_DEVICES,
+            this.STORAGE_DEVICES_VERSION,
+            TrezorDevice.deserialize
+        );
 
         // Load devices from the storage
         this._devices = this._storage.init();

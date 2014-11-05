@@ -7,36 +7,45 @@ angular.module('webwalletApp').factory('ItemStorage', function (
     'use strict';
 
     /**
-     * Item storage -- persist a list of objects in localStorage
+     * Item storage -- persist a list of item instances in localStorage.
      *
-     * Initialize new item storage.
+     * Item instance can be either a class instance or an Object.
      *
-     * Passed `options` object has these mandatory properties:
-     * - {Function} `type`: A class that implements a method `#deserialize()`
-     *      that converts a String to class instance.
-     * - {String} `version`: Data version.  Stored in localStorage under the
-     *      key read from `options.keyVersion`.
-     * - {String} `keyItems`: Key under which the items will be stored.
-     *      Used like this: `localStorage[keyItems] = items`.
-     * - {String} `keyVersion`: Key under which the data version will be
-     *      stored.  Used like this: `localStorage[keyVersion] = version`.
+     * If an instance implements method `serialize()`, then this method is used
+     * to convert instance to String.  Otherwise `JSON.stringify()` is used.
      *
-     * @param {Object} options  Options in format:
-     *                          {type: Function, version: String,
-     *                          keyItems: String, keyVersion: String}
+     * If optional param `deserialize` is passed, then this function is used
+     * to convert String to instance.  Otherwise `JSON.parse()` is used.
+     *
      * @constructor
+     *
+     * @param {String} version          Data version.  Stored in localStorage
+     *                                  under the key read from param
+     *                                  `keyVersion`.
+     * @param {String} keyItems         Key under which the items will be
+     *                                  stored.  Used like this:
+     *                                  `localStorage[keyItems] = items`.
+     * @param {String} keyVersion       Key under which the data version will
+     *                                  be stored.  Used like this:
+     *                                  `localStorage[keyVersion] = version`.
+     * @param {Function} [deserialize]  Function that converts a String to item
+     *                                  instance.  If not passed,
+     *                                  `JSON.parse()` is used.
+     * @param {Object} [empty]          Initial value of this empty storage
+     *                                  Typically empty Array or empty Object.
      */
-    function ItemStorage(options) {
-        this._type = options.type;
-        this._version = options.version;
-        this._keyItems = options.keyItems;
-        this._keyVersion = options.keyVersion;
+    function ItemStorage(version, keyItems, keyVersion, deserialize, empty) {
+        this._version = version;
+        this._keyItems = keyItems;
+        this._keyVersion = keyVersion;
+        this._deserializeFn = deserialize;
+        this._empty = empty;
     }
 
-    ItemStorage.prototype._type = null;
     ItemStorage.prototype._version = null;
     ItemStorage.prototype._keyItems = null;
     ItemStorage.prototype._keyVersion = null;
+    ItemStorage.prototype._deserializeFn = null;
 
     /**
      * Restore the list of item objects from localStorage and start watching it
@@ -92,9 +101,33 @@ angular.module('webwalletApp').factory('ItemStorage', function (
      * @return {Array of Strings}  Serialized items
      */
     ItemStorage.prototype._serialize = function (items) {
-        return items.map(function (item) {
+        var key,
+            serialized,
+            ret;
+        if (Array.isArray(items)) {
+            ret = items.map(this._serializeItem.bind(this));
+        } else if (typeof items === 'object') {
+            serialized = {};
+            for (key in items) {
+                if (items.hasOwnProperty(key)) {
+                    serialized[key] = this._serializeItem(items[key]);
+                }
+            }
+            ret = serialized;
+        } else {
+            ret = this._serializeItem(items);
+        }
+        return ret;
+    };
+
+    /**
+     * TODO
+     */
+    ItemStorage.prototype._serializeItem = function (item) {
+        if (typeof item.serialize === 'function') {
             return item.serialize();
-        });
+        }
+        return JSON.stringify(item);
     };
 
     /**
@@ -105,9 +138,30 @@ angular.module('webwalletApp').factory('ItemStorage', function (
      * @return {Array}                  Item list
      */
     ItemStorage.prototype._deserialize = function (data) {
-        return data.map(function (item) {
-            return this._type.deserialize(item);
-        }.bind(this));
+        var key,
+            deserialized,
+            ret;
+        if (Array.isArray(data)) {
+            ret = data.map(this._deserializeItem.bind(this));
+        } else if (typeof data === 'object') {
+            deserialized = {};
+            for (key in data) {
+                if (data.hasOwnProperty(key)) {
+                    deserialized[key] = this._deserializeItem(data[key]);
+                }
+            }
+            ret = deserialized;
+        } else {
+            ret = this._deserializeItem(data);
+        }
+        return ret;
+    };
+
+    ItemStorage.prototype._deserializeItem = function (item) {
+        if (typeof this._deserializeFn === 'function') {
+            return this._deserializeFn(item);
+        }
+        return JSON.parse(item);
     };
 
     /**
@@ -136,7 +190,7 @@ angular.module('webwalletApp').factory('ItemStorage', function (
         if (items && version === this._version) {
             return JSON.parse(items);
         }
-        return [];
+        return this._empty || [];
     };
 
     return ItemStorage;

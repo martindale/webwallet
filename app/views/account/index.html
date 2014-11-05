@@ -23,7 +23,7 @@
           <tr class="txlist-tx"
               ng-repeat="tx in account.transactions"
               ng-class="{ 'selected': tx.active }"
-              tooltip="Click to see transaction details and to edit the label."
+              tooltip="Click to see transaction details and to label the addresses."
               ng-click="tx.active = !tx.active">
             <td class="txlist-date"
                 ng-if="tx.block">
@@ -100,7 +100,8 @@
                 ng-submit="">
                 <input type="text" class="form-control"
                   placeholder="Give your own label to this address"
-                  ng-model="tx.label">
+                  ng-model="tx.label"
+                  ng-click="$event.stopPropagation()">
               </form>
             </td>
             <td class="txlist-amount"

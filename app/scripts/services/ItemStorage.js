@@ -33,13 +33,18 @@ angular.module('webwalletApp').factory('ItemStorage', function (
      *                                  `JSON.parse()` is used.
      * @param {Object} [empty]          Initial value of this empty storage
      *                                  Typically empty Array or empty Object.
+     * @param {Boolean} [flagWatch]     Do you want to watch loaded item list
+     *                                  for changes and immediately store them
+     *                                  to the storage?  Default true.
      */
-    function ItemStorage(version, keyItems, keyVersion, deserialize, empty) {
+    function ItemStorage(version, keyItems, keyVersion, deserialize, empty,
+            flagWatch) {
         this._version = version;
         this._keyItems = keyItems;
         this._keyVersion = keyVersion;
         this._deserializeFn = deserialize;
         this._empty = empty;
+        this._flagWatch = flagWatch;
     }
 
     ItemStorage.prototype._version = null;
@@ -55,8 +60,22 @@ angular.module('webwalletApp').factory('ItemStorage', function (
      * @return {Promise}  Return value of Angular's `$rootScope.$watch()`
      */
     ItemStorage.prototype.init = function () {
+        if (!this._flagWatch) {
+            return this.load();
+        }
         return this._watch(
             this._load()
+        );
+    };
+
+    /**
+     * Store passed item list to localStorage.
+     *
+     * @param {Array} items  Item list
+     */
+    ItemStorage.prototype.save = function (items) {
+        this._store(
+            this._serialize(items)
         );
     };
 
@@ -66,7 +85,7 @@ angular.module('webwalletApp').factory('ItemStorage', function (
      *
      * @return {Array}  Item list
      */
-    ItemStorage.prototype._load = function () {
+    ItemStorage.prototype.load = function () {
         return this._deserialize(
             this._restore()
         );

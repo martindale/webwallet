@@ -20,9 +20,10 @@
         <div class="col-md-8">
 
           <div class="receive-bar"
-              ng-show="!usedAddresses.length && account.transactions.length">
+              ng-show="!usedAddresses.length">
             <button class="address-list-toggleused btn btn-sm btn-link pull-right"
-                ng-click="usedAddresses = account.usedAddresses()">
+                ng-click="usedAddresses = account.usedAddresses()"
+                ng-show="account.transactions.length">
               <span class="glyphicon glyphicon-chevron-up"></span> Show used
             </button>
             <h4>

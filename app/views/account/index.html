@@ -22,7 +22,7 @@
         </thead>
         <tbody>
           <tr class="txlist-tx"
-              ng-repeat="tx in account.transactions"
+              ng-repeat="tx in addLabelsToTxs(account.transactions)"
               ng-class="{ 'selected': tx.active }"
               tooltip="Click to see transaction details and to label the addresses."
               ng-click="tx.active = !tx.active">
@@ -36,7 +36,7 @@
               <small title="Transaction received at {{tx.timestamp | date:'yyyy-MM-dd HH:mm:ss'}}"
                 >Unconfirmed</small>
             </td>
-            <td ng-if="!tx.active"
+            <td ng-show="!tx.active"
                 ng-switch="tx.analysis.type">
               <div class="txlist-address">
                 <a href="{{blockExplorer.urlTx}}{{tx.hash}}"
@@ -47,20 +47,20 @@
                 <span class="text-success" ng-switch-when="recv">
                   <span class="glyphicon glyphicon-circle-arrow-right"
                     title="Received"></span>
-                  <span ng-if="tx.label" title="{{tx.analysis.addr.toString()}}">
-                    {{tx.label}}
+                  <span ng-if="tx._label" title="{{tx.analysis.addr.toString()}}">
+                    {{tx._label}}
                   </span>
-                  <span ng-if="!tx.label">
+                  <span ng-if="!tx._label">
                     {{tx.analysis.addr.toString()}}
                   </span>
                 </span>
                 <span class="text-danger" ng-switch-when="sent">
                   <span class="glyphicon glyphicon-circle-arrow-left"
                     title="Sent"></span>
-                  <span ng-if="tx.label" title="{{tx.analysis.addr.toString()}}">
-                    {{tx.label}}
+                  <span ng-if="tx._label" title="{{tx.analysis.addr.toString()}}">
+                    {{tx._label}}
                   </span>
-                  <span ng-if="!tx.label">
+                  <span ng-if="!tx._label">
                     {{tx.analysis.addr.toString()}}
                   </span>
                 </span>
@@ -72,7 +72,7 @@
                 </span>
               </div>
             </td>
-            <td ng-if="tx.active"
+            <td ng-show="tx.active"
                 ng-switch="tx.analysis.type">
               <div class="txlist-address">
                 <a href="{{blockExplorer.urlTx}}{{tx.hash}}"
@@ -97,12 +97,25 @@
                   <span class="glyphicon glyphicon-question-sign"></span> Unknown
                 </span>
               </div>
-              <form role="form" class="txlist-label">
-                <input type="text" class="form-control"
-                  placeholder="Give your own label to this address"
-                  ng-model="tx._label"
-                  ng-click="$event.stopPropagation()"
-                  ng-change="saveAddressLabel(tx)">
+              <form role="form" class="txlist-label"
+                  ng-submit="saveAddressLabels()"
+                  ng-click="$event.stopPropagation()">
+                <div class="input-group">
+                  <input type="text" class="form-control"
+                    placeholder="Give your own label to this address"
+                    ng-model="tx._label"
+                    ng-change="changeAddressLabel(tx)">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"
+                      ng-show="labelsChanged">
+                      <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </button>
+                    <button class="btn btn-default" type="submit"
+                      ng-show="!labelsChanged" disabled>
+                      <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                  </span>
+                </div>
               </form>
             </td>
             <td class="txlist-amount"

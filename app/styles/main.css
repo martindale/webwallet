@@ -417,11 +417,11 @@ body {
 .txlist-hash .glyphicon {
   display: none;
 }
+.txlist-tx:hover .txlist-address .glyphicon {
+  display: none;
+}
 .txlist-tx:hover .txlist-hash .glyphicon {
   display: inline-block;
-}
-.txlist-tx:hover .glyphicon {
-  display: none;
 }
 
 /* Form */

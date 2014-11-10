@@ -1,6 +1,7 @@
 /*global angular*/
 
 angular.module('webwalletApp').factory('metadata', function (
+    _,
     config,
     ItemStorage) {
 
@@ -17,13 +18,31 @@ angular.module('webwalletApp').factory('metadata', function (
             this.STORAGE_METADATA,
             this.STORAGE_METADATA_VERSION,
             null,
-            {}
+            {},
+            false
         );
         this._data = this._storage.init();
     }
 
     Metadata.prototype.STORAGE_METADATA = 'trezorMetadata';
     Metadata.prototype.STORAGE_METADATA_VERSION = 'trezorMetadataVersion';
+
+    /**
+     * TODO
+     */
+    Metadata.prototype.save = function () {
+        this._storage.save(this._data);
+    };
+
+    /**
+     * TODO
+     */
+    Metadata.prototype.getAllAddressLabels = function () {
+        if (this._data.addresses) {
+            return _.clone(this._data.addresses);
+        }
+        return {};
+    };
 
     /**
      * TODO
@@ -38,12 +57,14 @@ angular.module('webwalletApp').factory('metadata', function (
      * TODO
      */
     Metadata.prototype.setAddressLabel = function (addr, label) {
-        // console.log('Metadata.prototype.setAddressLabel', addr, label);
         if (!this._data.addresses) {
             this._data.addresses = {};
         }
-        this._data.addresses[addr] = label;
-        // console.log(this._data);
+        if (label !== null && label !== undefined) {
+            this._data.addresses[addr] = label;
+        } else if (this._data.addresses[addr]) {
+            delete this._data.addresses[addr];
+        }
     };
 
     /**

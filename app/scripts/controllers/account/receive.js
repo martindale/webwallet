@@ -1,37 +1,68 @@
 /*global angular */
 
 angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
+    metadata,
     $document,
     $scope,
     $timeout) {
 
     'use strict';
 
+    $scope.LOOK_AHEAD = 20;
+
     $scope.activeAddress = null;
     $scope.usedAddresses = [];
     $scope.addresses = [];
-    $scope.lookAhead = 20;
+    $scope.labelsChanged = false;
 
-    $scope.activate = function (address) {
-        $scope.activeAddress = address;
+    $scope.activate = function (addrObj) {
+        $scope.activeAddress = addrObj;
 
-        // select the address text
+        /*
+         * Select the address text.
+         *
+         * Depends on HTML class `js-address`.
+         */
         $timeout(function () {
-            var addr = address.address,
-                elem = $document.find('.address-list-address:contains('+addr+')');
-            if (elem.length)
+            var elem = $document.find(
+                    '.js-address:contains(' + addrObj.address + ')'
+                );
+            if (elem.length) {
                 selectRange(elem[0]);
+            }
         });
     };
 
     $scope.more = function () {
         var index = $scope.addresses.length,
-            address = $scope.account.address(index);
-        $scope.addresses[index] = address;
-        $scope.activate(address);
+            address = $scope.account.address(index),
+            addrObj = {
+                address: address.address,
+                index: address.path[address.path.length - 1],
+                label: metadata.getAddressLabel(address.address),
+            };
+        $scope.addresses[index] = addrObj;
+        $scope.activate(addrObj);
     };
 
     $scope.more();
+
+    $scope.getUsedAddresses = function () {
+        var usedAddresses = [],
+            usedAddressesRaw = $scope.account.usedAddresses(),
+            address,
+            i,
+            l;
+        for (i = 0, l = usedAddressesRaw.length; i < l; i = i + 1) {
+            address = usedAddressesRaw[i];
+            usedAddresses.push({
+                address: address.address,
+                index: address.path[address.path.length - 1],
+                label: metadata.getAddressLabel(address.address)
+            });
+        }
+        $scope.usedAddresses = usedAddresses;
+    };
 
     function selectRange(elem) {
         var selection, range,
@@ -54,5 +85,24 @@ angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
             return;
         }
     }
+
+    /**
+     * TODO
+     */
+    $scope.changeAddressLabel = function (addrObj) {
+        $scope.labelsChanged = true;
+        metadata.setAddressLabel(
+            addrObj.address,
+            addrObj.label
+        );
+    };
+
+    /**
+     * TODO
+     */
+    $scope.saveAddressLabels = function () {
+        metadata.save();
+        $scope.labelsChanged = false;
+    };
 
 });

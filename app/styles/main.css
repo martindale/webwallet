@@ -464,6 +464,10 @@ body {
   float: left;
   overflow: hidden;
   width: 25em;
+}
+.receive-address,
+.receive-label,
+.receive-addresses .input-group-btn button {
   height: auto;
   padding: 0.5em 1em;
   line-height: 1.5;
@@ -471,15 +475,19 @@ body {
 .receive-label {
   width: auto;
 }
+.receive-address em {
+  display: inline-block;
+  min-width: 1.5em;
+  opacity: 0.5;
+  font-style: normal;
+  line-height: 1.5;
+}
 .receive-more {
-  /* text-align: center; */
   padding: 0.7em 0;
 }
 .receive-unused {
   padding-bottom: 0.7em;
 }
-
-/* Addresses */
 .receive-addresses {
   clear: both;
 }
@@ -492,10 +500,6 @@ body {
   color: hsl(208, 40%, 43%);
   background-color: hsla(208, 56%, 53%, 0.2);
   border-color: hsla(208, 56%, 53%, 0.5);
-}
-.receive-addresses em {
-  padding-left: 0.5em;
-  opacity: 0.2;
 }
 
 /* QR */

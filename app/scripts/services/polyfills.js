@@ -12,30 +12,3 @@ Array.prototype.equals = function (array) {
     }
     return true;
 };
-
-Object.prototype.equals = function (obj) {
-    'use strict';
-
-    var prop;
-
-    for (prop in obj) {
-        if (obj.hasOwnProperty(prop)) {
-            if (!this.hasOwnProperty(prop)) {
-                return false;
-            }
-            if (this[prop] !== obj[prop]) {
-                return false;
-            }
-        }
-    }
-
-    for (prop in this) {
-        if (this.hasOwnProperty(prop)) {
-            if (!obj.hasOwnProperty(prop)) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};

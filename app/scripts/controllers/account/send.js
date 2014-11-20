@@ -1,6 +1,7 @@
 /*global angular, CSV*/
 
 angular.module('webwalletApp').controller('AccountSendCtrl', function (
+    metadata,
     temporaryStorage,
     flash,
     utils,
@@ -100,6 +101,7 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
     function _doFillOutput(output) {
         return {
             address: output.address,
+            label: output.label,
             amount: output.amount || '',
             amountAlt: output.amountAlt || '',
             currencyAlt: output.currencyAlt
@@ -118,6 +120,9 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
             };
             if ($routeParams.amount) {
                 output.amount = $routeParams.amount;
+            }
+            if ($routeParams.label) {
+                output.label = $routeParams.label;
             }
             $scope.tx.values = {
                 outputs: [fillOutput(output)]
@@ -376,6 +381,9 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
 
         $scope.sending = true;
         $scope.outputIndex = 0;
+
+        // Metadata
+        metadata.save();
 
         $scope.account.sendTx(tx, $scope.device).then(
             function (res) {
@@ -727,4 +735,24 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
         return $q.when(_supportedAltCurrenciesCache);
     }
 
+    /**
+     * TODO
+     */
+    $scope.overwriteAddressLabel = function (output) {
+        if (output.address && !output.label) {
+            output.label = metadata.getAddressLabel(output.address);
+        }
+    };
+
+    /**
+     * TODO
+     */
+    $scope.changeAddressLabel = function (output) {
+        if (output.address && output.label) {
+            metadata.setAddressLabel(
+                output.address,
+                output.label
+            );
+        }
+    };
 });

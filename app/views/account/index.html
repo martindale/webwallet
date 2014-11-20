@@ -43,6 +43,7 @@
                    class="txlist-hash"
                    target="_blank"
                    title="Transaction info at {{blockExplorer.name}}"
+                   ng-click="$event.stopPropagation()"
                    ><span class="glyphicon glyphicon-info-sign"></span></a>
                 <span class="text-success" ng-switch-when="recv">
                   <span class="glyphicon glyphicon-circle-arrow-right"
@@ -79,6 +80,7 @@
                    class="txlist-hash"
                    target="_blank"
                    title="Transaction info at {{blockExplorer.name}}"
+                   ng-click="$event.stopPropagation()"
                    ><span class="glyphicon glyphicon-info-sign"></span></a>
                 <span class="text-success" ng-switch-when="recv">
                   <span class="glyphicon glyphicon-circle-arrow-right"

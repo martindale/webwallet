@@ -102,6 +102,7 @@
                   <input id="label" class="form-control" type="text"
                     ng-model="output.label"
                     ng-change="changeAddressLabel(output)"
+                    ng-disabled="isMetadataLoading()"
                     placeholder="Give your own label to this address"
                     required>
                 </div>

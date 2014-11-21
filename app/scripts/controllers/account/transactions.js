@@ -16,50 +16,43 @@ angular.module('webwalletApp').controller('AccountTransactionsCtrl', function (
     $scope.labelsChanged = false;
 
     /**
+     * Add labels to transactions.
+     *
      * TODO
      */
+    function _doAddLabelsToTxs(txs) {
+        metadata.getAllAddressLabels(function (labels) {
+            var i,
+                l,
+                tx,
+                addr;
+            for (i = 0, l = txs.length; i < l; i = i + 1) {
+                tx = txs[i];
+                addr = _getTxAddress(tx);
+                if (labels[addr] !== null && labels[addr] !== undefined) {
+                    txs[i]._label = labels[addr];
+                }
+            }
+        });
+    }
+
     $scope.addLabelsToTxs = function (newTxs) {
-        var i,
-            l,
-            tx,
-            addr;
         // No transactions -- return.
         if (newTxs === null) {
             txs = newTxs;
             return txs;
         }
-        // Transactions didn't change.
-        if (txs !== null && txs.equals(newTxs)) {
-            // If labels changed, refresh them and continue.
-            if (labels === null) {
-                labels = metadata.getAllAddressLabels();
-            // Nothing changed -- return.
-            } else {
-                return txs;
-            }
-        // Transactions changed.
-        } else {
-            // Refresh label list if necessary.
-            if (labels === null) {
-                labels = metadata.getAllAddressLabels();
-            }
-            // Refresh transaction list.
+        if (txs === null || !txs.equals(newTxs)) {
+            // Transactions changed, refresh them.
             txs = newTxs.slice();
         }
-        // Add labels to transactions.
-        for (i = 0, l = txs.length; i < l; i = i + 1) {
-            tx = txs[i];
-            addr = _getTxAddress(tx);
-            if (labels[addr] !== null && labels[addr] !== undefined) {
-                txs[i]._label = labels[addr];
-            }
+        if (labels === null) {
+            // Labels changed, refresh them.
+            _doAddLabelsToTxs(txs);
         }
         return txs;
     };
 
-    /**
-     * TODO
-     */
     $scope.changeAddressLabel = function (tx) {
         $scope.labelsChanged = true;
         metadata.setAddressLabel(
@@ -69,12 +62,12 @@ angular.module('webwalletApp').controller('AccountTransactionsCtrl', function (
         labels = null;
     };
 
-    /**
-     * TODO
-     */
     $scope.saveAddressLabels = function () {
         metadata.save();
         $scope.labelsChanged = false;
     };
 
+    $scope.isMetadataLoading = function () {
+        return metadata.isLoading();
+    };
 });

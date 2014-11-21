@@ -39,10 +39,14 @@ angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
             addrObj = {
                 address: address.address,
                 index: address.path[address.path.length - 1],
-                label: metadata.getAddressLabel(address.address),
+                label: null
             };
         $scope.addresses[index] = addrObj;
         $scope.activate(addrObj);
+
+        metadata.getAddressLabel(address.address, function (label) {
+            addrObj.label = label;
+        });
     };
 
     $scope.more();
@@ -58,10 +62,23 @@ angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
             usedAddresses.push({
                 address: address.address,
                 index: address.path[address.path.length - 1],
-                label: metadata.getAddressLabel(address.address)
+                label: null
             });
         }
-        $scope.usedAddresses = usedAddresses;
+
+        metadata.getAllAddressLabels(function (addresses) {
+            var i,
+                l,
+                label;
+            for (i = 0, l = usedAddresses.length; i < l; i = i + 1) {
+                label = addresses[usedAddresses[i].address];
+                if (label) {
+                    usedAddresses[i].label = label;
+                }
+            }
+        });
+
+        return usedAddresses;
     };
 
     function selectRange(elem) {
@@ -86,9 +103,6 @@ angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
         }
     }
 
-    /**
-     * TODO
-     */
     $scope.changeAddressLabel = function (addrObj) {
         $scope.labelsChanged = true;
         metadata.setAddressLabel(
@@ -97,12 +111,12 @@ angular.module('webwalletApp').controller('AccountReceiveCtrl', function (
         );
     };
 
-    /**
-     * TODO
-     */
     $scope.saveAddressLabels = function () {
         metadata.save();
         $scope.labelsChanged = false;
     };
 
+    $scope.isMetadataLoading = function () {
+        return metadata.isLoading();
+    };
 });

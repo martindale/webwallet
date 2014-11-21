@@ -740,7 +740,9 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
      */
     $scope.overwriteAddressLabel = function (output) {
         if (output.address && !output.label) {
-            output.label = metadata.getAddressLabel(output.address);
+            metadata.getAddressLabel(output.address, function (label) {
+                output.label = label;
+            });
         }
     };
 
@@ -754,5 +756,9 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
                 output.label
             );
         }
+    };
+
+    $scope.isMetadataLoading = function () {
+        return metadata.isLoading();
     };
 });

@@ -14,7 +14,7 @@ angular.module('webwalletApp').factory('deviceList', function (
     trezor,
     trezorApi,
     TrezorDevice,
-    ItemStorage,
+    LocalItemStorage,
     $location) {
 
     'use strict';
@@ -66,7 +66,7 @@ angular.module('webwalletApp').factory('deviceList', function (
      */
     DeviceList.prototype._restore = function () {
         // Initialize the device storage
-        this._storage = new ItemStorage(
+        this._storage = new LocalItemStorage(
             config.storageVersion,
             this.STORAGE_DEVICES,
             this.STORAGE_DEVICES_VERSION,
@@ -74,12 +74,26 @@ angular.module('webwalletApp').factory('deviceList', function (
         );
 
         // Load devices from the storage
-        this._devices = this._storage.init();
+        this._storage.load(function (items) {
+            if (!items) {
+                return;
+            }
 
-        // Initialize all devices
-        this._devices.forEach(function (dev) {
-            dev.init();
-        });
+            /*
+             * ...but only if the device list wasn't changed while the storage
+             * was responding.
+             */
+            if (this._devices === null) {
+                this._devices = items;
+                // Store the list back to storage every time the list changes.
+                this._storage.watch(this._devices);
+            }
+
+            // Initialize all devices
+            this._devices.forEach(function (dev) {
+                dev.init();
+            });
+        }.bind(this));
     };
 
     /**
@@ -174,6 +188,17 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @param {TrezorDevice} dev  Device to remove
      */
     DeviceList.prototype.remove = function (dev) {
+        /*
+         * Hypothetical situation: User connects a device before the storage
+         * responds with the list of remembered devices and then the user
+         * immediately requests forgetting of the device, but after this the
+         * response from the storage arrives and makes the device reappear.
+         * We fix this by setting the device array to a non-null value, so that
+         * we know -- while processing the storage response -- that the user
+         * already made changes to the list of devices.
+         */
+        this._devices = this._devices || [];
+
         dev.destroy();
         _.remove(this._devices, { id: dev.id });
     };

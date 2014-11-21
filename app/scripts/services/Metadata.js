@@ -2,8 +2,9 @@
 
 angular.module('webwalletApp').factory('metadata', function (
     _,
+    $q,
     config,
-    ItemStorage) {
+    RemoteItemStorage) {
 
     'use strict';
 
@@ -13,71 +14,93 @@ angular.module('webwalletApp').factory('metadata', function (
      * @constructor
      */
     function Metadata() {
-        this._storage = new ItemStorage(
+        this._storage = new RemoteItemStorage(
             config.storageVersion,
             this.STORAGE_METADATA,
-            this.STORAGE_METADATA_VERSION,
-            null,
-            {},
-            false
+            this.STORAGE_METADATA_VERSION
         );
-        this._data = this._storage.init();
     }
 
     Metadata.prototype.STORAGE_METADATA = 'trezorMetadata';
     Metadata.prototype.STORAGE_METADATA_VERSION = 'trezorMetadataVersion';
 
-    /**
-     * TODO
-     */
+    Metadata.prototype._storage = null;
+    Metadata.prototype._data = null;
+    Metadata.prototype._promise = null;
+    Metadata.prototype._done = false;
+
+    Metadata.prototype._getData = function (callback) {
+        var deferred;
+
+        if (this._data !== null) {
+            callback(this._data);
+            return;
+        }
+        /*
+         * If we are already loading the data, do not trigger another data
+         * loading, but rather put the callback to the queue of callbacks,
+         * which will be fired once the data loading finishes.
+         */
+        if (this._promise !== null) {
+            this._promise = this._promise.then(callback);
+            return;
+        }
+
+        deferred = $q.defer();
+        this._promise = deferred.promise;
+
+        this._storage.load(function (items) {
+            this._data = items || {};
+            this._done = true;
+            callback(this._data);
+            deferred.resolve(items);
+        }.bind(this));
+    };
+
+    Metadata.prototype.isLoading = function () {
+        return !this._done;
+    };
+
     Metadata.prototype.save = function () {
-        this._storage.save(this._data);
+        this._getData(function (data) {
+            this._storage.save(data);
+        }.bind(this));
     };
 
-    /**
-     * TODO
-     */
-    Metadata.prototype.getAllAddressLabels = function () {
-        if (this._data.addresses) {
-            return _.clone(this._data.addresses);
-        }
-        return {};
+    Metadata.prototype.getAllAddressLabels = function (callback) {
+        this._getData(function (data) {
+            if (data && data.addresses) {
+                callback(_.clone(data.addresses));
+            }
+        });
     };
 
-    /**
-     * TODO
-     */
-    Metadata.prototype.getAddressLabel = function (addr) {
-        if (this._data.addresses) {
-            return this._data.addresses[addr];
-        }
+    Metadata.prototype.getAddressLabel = function (addr, callback) {
+        this._getData(function (data) {
+            if (data && data.addresses) {
+                callback(data.addresses[addr]);
+            }
+        });
     };
 
-    /**
-     * TODO
-     */
     Metadata.prototype.setAddressLabel = function (addr, label) {
-        if (!this._data.addresses) {
-            this._data.addresses = {};
-        }
-        if (label !== null && label !== undefined) {
-            this._data.addresses[addr] = label;
-        } else if (this._data.addresses[addr]) {
-            delete this._data.addresses[addr];
-        }
+        this._getData(function (data) {
+            if (!data.addresses || typeof data.addresses !== 'object') {
+                data.addresses = {};
+            }
+            if (label !== null && label !== undefined) {
+                data.addresses[addr] = label;
+            } else if (data.addresses[addr]) {
+                delete data.addresses[addr];
+            }
+        });
     };
 
-    /**
-     * TODO
-     */
-    Metadata.prototype.getOutputLabel = function (txHash, index) {
+    Metadata.prototype.getOutputLabel = function (txHash, index, callback) {
         throw new Error('Not implemented yet.');
     };
 
-    /**
-     * TODO
-     */
-    Metadata.prototype.getTxLabel = function (txHash) {
+    Metadata.prototype.getTxLabel = function (txHash, callback) {
         throw new Error('Not implemented yet.');
     };
 

@@ -42,15 +42,36 @@
           </div>
           <div class="list-group receive-addresses receive-used"
                ng-show="usedAddresses.length">
-            <a class="list-group-item"
-               ng-repeat="addrObj in usedAddresses"
-               ng-class="{ active: activeAddress.address === addrObj.address }"
-               ng-click="activate(addrObj)">
-              <em>{{addrObj.index}}:</em>
-              <span class="js-address">{{addrObj.address}}</span>
-              <small class="text-success pull-right"
-                >({{addrObj.balance | amount}} {{account.coin.coin_shortcut}})</small>
-            </a>
+            <div ng-repeat="addrObj in usedAddresses">
+              <a class="list-group-item receive-address"
+                 ng-class="{ active: activeAddress.address === addrObj.address }"
+                 ng-click="activate(addrObj)">
+                <em>{{addrObj.index}}:</em>
+                <span class="js-address">{{addrObj.address}}</span>
+                <small class="text-success pull-right"
+                  >({{addrObj.balance | amount}} {{account.coin.coin_shortcut}})</small>
+              </a>
+              <form role="form"
+                  ng-submit="saveAddressLabels()">
+                <div class="input-group">
+                  <input type="text" class="form-control receive-label"
+                    placeholder="Address label"
+                    ng-model="addrObj.label"
+                    ng-change="changeAddressLabel(addrObj)"
+                    ng-disabled="isMetadataLoading()">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit"
+                      ng-show="labelsChanged">
+                      <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </button>
+                    <button class="btn btn-default" type="submit"
+                      ng-show="!labelsChanged" disabled>
+                      <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                  </span>
+                </div>
+              </form>
+            </div>
           </div>
 
           <div class="list-group receive-addresses">
@@ -71,7 +92,8 @@
                     <input type="text" class="form-control receive-label"
                       placeholder="Address label"
                       ng-model="addrObj.label"
-                      ng-change="changeAddressLabel(addrObj)">
+                      ng-change="changeAddressLabel(addrObj)"
+                      ng-disabled="isMetadataLoading()">
                     <span class="input-group-btn">
                       <button class="btn btn-primary" type="submit"
                         ng-show="labelsChanged">

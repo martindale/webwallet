@@ -61,6 +61,10 @@ angular.module('webwalletApp').factory('TrezorDevice', function (
     };
 
     TrezorDevice.deserialize = function (data) {
+        if (!data || !data.id) {
+            return;
+        }
+
         var dev = new TrezorDevice(data.id);
 
         dev._passphrase = data.passphrase;

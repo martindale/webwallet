@@ -38,7 +38,7 @@ angular.module('webwalletApp').controller('AccountTransactionsCtrl', function (
 
     $scope.addLabelsToTxs = function (newTxs) {
         // No transactions -- return.
-        if (newTxs === null) {
+        if (newTxs === undefined || newTxs === null) {
             txs = newTxs;
             return txs;
         }

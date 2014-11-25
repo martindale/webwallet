@@ -100,6 +100,10 @@
         LocalItemStorage.prototype.get = function (key, callback) {
             var val = localStorage[key],
                 parsed;
+            if (val === undefined) {
+                callback(val);
+                return;
+            }
             try {
                 parsed = JSON.parse(val);
                 callback(parsed);

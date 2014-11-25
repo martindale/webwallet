@@ -18,12 +18,16 @@ angular.module('webwalletApp').controller('DeviceCtrl', function (
 
     var disconnectModal = null;
 
-    // Get current device or go to homepage.
-    $scope.device = deviceList.get($routeParams.deviceId);
-    if (!$scope.device) {
-        $location.path('/');
-        return;
-    }
+    /**
+     * Set current device reference to $scope or go to homepage.
+     */
+    deviceService.whenLoaded(function init() {
+        $scope.device = deviceList.get($routeParams.deviceId); // FIXME
+        if (!$scope.device) {
+            $location.path('/');
+            return;
+        }
+    });
 
     // Handle device events -- buttons and disconnect.
     $scope.$on(TrezorDevice.EVENT_PREFIX + TrezorDevice.EVENT_PIN,

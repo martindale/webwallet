@@ -2,7 +2,7 @@
   <div ng-controller="AccountCtrl">
 
     <div class="alert alert-danger alert-inconsistent"
-         ng-show="account.isInconsistent()">
+         ng-show="account && account.isInconsistent()">
       <strong>Warning!</strong> Account balance information is inconsistent.
     </div>
 
@@ -11,7 +11,7 @@
     <div class="tab-content"
         ng-controller="AccountTransactionsCtrl">
       <table class="txlist table table-hover"
-             ng-show="account.transactions != null && account.transactions.length">
+             ng-show="account && account.transactions != null && account.transactions.length">
         <thead>
           <tr class="text-muted">
             <th width="20%">Timestamp</th>
@@ -144,7 +144,7 @@
       </table>
 
       <div class="txlist-empty text-center text-muted"
-           ng-show="account.transactions != null && !account.transactions.length">
+           ng-show="account && account.transactions != null && !account.transactions.length">
         <h4>No transactions to display</h4>
         <button class="btn btn-default"
                 ng-show="device.canHideAccount(account)"
@@ -153,7 +153,7 @@
       </div>
 
       <div class="txlist-loading text-center text-muted"
-           ng-show="account.transactions == null">
+           ng-show="!account || account.transactions == null">
         <span class="icon-loading" title="Loading transactions..."></span>
       </div>
     </div>

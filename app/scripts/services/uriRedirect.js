@@ -102,7 +102,7 @@ angular.module('webwalletApp').factory('uriRedirect', function (
     }
 
     // Get default device and default account.
-    device = deviceList.getDefault();
+    device = deviceList.getDefault(); // FIXME
     if (!device) {
         console.warn('[uri] Failed to find default device.  No redirect to Send will be made.');
         $location.path('/');

@@ -38,21 +38,24 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @constructor
      */
     function DeviceList() {
-        this._devices = [];
-
-        this._watchPaused = false;
-        this._enumerateInProgress = false;
-        this._enumerateCanWait = false;
-
         this._beforeInitHooks = [];
         this._afterInitHooks = [];
         this._disconnectHooks = [];
         this._forgetHooks = [];
         this._afterForgetHooks = [];
-
-        // Load devices from localStorage
-        this._restore();
     }
+
+    DeviceList.prototype._devices = null;
+
+    DeviceList.prototype._watchPaused = false;
+    DeviceList.prototype._enumerateInProgress = false;
+    DeviceList.prototype._enumerateCanWait = false;
+
+    DeviceList.prototype._beforeInitHooks = null;
+    DeviceList.prototype._afterInitHooks = null;
+    DeviceList.prototype._disconnectHooks = null;
+    DeviceList.prototype._forgetHooks = null;
+    DeviceList.prototype._afterForgetHooks = null;
 
     DeviceList.prototype.STORAGE_DEVICES = 'trezorDevices';
     DeviceList.prototype.STORAGE_DEVICES_VERSION = 'trezorVersion';
@@ -62,41 +65,6 @@ angular.module('webwalletApp').factory('deviceList', function (
     DeviceList.prototype.DEFAULT_HOOK_NAME = 'anonymous';
 
     /**
-     * Load known devices from localStorage and initialize them.
-     */
-    DeviceList.prototype._restore = function () {
-        // Initialize the device storage
-        this._storage = new LocalItemStorage(
-            config.storageVersion,
-            this.STORAGE_DEVICES,
-            this.STORAGE_DEVICES_VERSION,
-            TrezorDevice.deserialize
-        );
-
-        // Load devices from the storage
-        this._storage.load(function (items) {
-            if (!items) {
-                return;
-            }
-
-            /*
-             * ...but only if the device list wasn't changed while the storage
-             * was responding.
-             */
-            if (this._devices === null) {
-                this._devices = items;
-                // Store the list back to storage every time the list changes.
-                this._storage.watch(this._devices);
-            }
-
-            // Initialize all devices
-            this._devices.forEach(function (dev) {
-                dev.init();
-            });
-        }.bind(this));
-    };
-
-    /**
      * Find a device by passed device ID or device descriptor.
      *
      * @param {String|Object} id         Device ID or descriptor in format
@@ -104,6 +72,10 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @return {TrezorDevice|undefined}  Device or undefined if not found
      */
     DeviceList.prototype.get = function (desc) {
+        if (!this._devices) {
+            return;
+        }
+
         var search;
         if (desc.id) {
             search = {id: desc.id};
@@ -128,6 +100,17 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @param {TrezorDevice} dev  Device to add
      */
     DeviceList.prototype.add = function (dev) {
+        /*
+         * Hypothetical situation: User connects a device before the storage
+         * responds with the list of remembered devices and then the user
+         * immediately requests forgetting of the device, but after this the
+         * response from the storage arrives and makes the device reappear.
+         * We fix this by setting the device array to a non-null value, so that
+         * we know -- while processing the storage response -- that the user
+         * already made changes to the list of devices.
+         */
+        this._devices = this._devices || [];
+
         this._devices.push(dev);
     };
 
@@ -156,7 +139,10 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @return {Array of TrezorDevice}       All devices
      */
     DeviceList.prototype.all = function (includeBootloader) {
-        if (includeBootloader) {
+        if (!this._devices) {
+            return [];
+        }
+        if (includeBootloader || !this._devices.length) {
             return this._devices;
         }
         return this._devices.filter(function (dev) {
@@ -188,15 +174,6 @@ angular.module('webwalletApp').factory('deviceList', function (
      * @param {TrezorDevice} dev  Device to remove
      */
     DeviceList.prototype.remove = function (dev) {
-        /*
-         * Hypothetical situation: User connects a device before the storage
-         * responds with the list of remembered devices and then the user
-         * immediately requests forgetting of the device, but after this the
-         * response from the storage arrives and makes the device reappear.
-         * We fix this by setting the device array to a non-null value, so that
-         * we know -- while processing the storage response -- that the user
-         * already made changes to the list of devices.
-         */
         this._devices = this._devices || [];
 
         dev.destroy();
@@ -218,6 +195,43 @@ angular.module('webwalletApp').factory('deviceList', function (
                 this.remove(param.dev);
             }.bind(this))
             .then(this._execHooks(this._afterForgetHooks));
+    };
+
+    /**
+     * Load known devices from localStorage and initialize them.
+     *
+     * @param {Function} callback  Called when the device loading is finished.
+     */
+    DeviceList.prototype.restore = function (callback) {
+        // Initialize the device storage
+        this._storage = new LocalItemStorage(
+            config.storageVersion,
+            this.STORAGE_DEVICES,
+            this.STORAGE_DEVICES_VERSION,
+            TrezorDevice.deserialize
+        );
+
+        // Load devices from the storage
+        this._storage.load(function (items) {
+            items = items || [];
+
+            /*
+             * ...but only if the device list wasn't changed while the storage
+             * was responding.
+             */
+            if (this._devices === null) {
+                this._devices = items;
+                // Store the list back to storage every time the list changes.
+                this._storage.watch(this._devices);
+            }
+
+            // Initialize all devices
+            this._devices.forEach(function (dev) {
+                dev.init();
+            });
+
+            callback();
+        }.bind(this));
     };
 
     /**

@@ -27,7 +27,9 @@ angular.module('webwalletApp')
 
         'use strict';
 
-        var _forgetRequested = false,
+        var _loaded = false,
+            _forgetRequested = false,
+            _onLoad = [],
             EVENT_ASK_FORGET = 'device.askForget',
             EVENT_ASK_DISCONNECT = 'device.askDisconnect',
             EVENT_CLOSE_DISCONNECT = 'device.closeDisconnect';
@@ -35,6 +37,20 @@ angular.module('webwalletApp')
         this.EVENT_ASK_FORGET = EVENT_ASK_FORGET;
         this.EVENT_ASK_DISCONNECT = EVENT_ASK_DISCONNECT;
         this.EVENT_CLOSE_DISCONNECT = EVENT_CLOSE_DISCONNECT;
+
+        // Load devices from localStorage
+        deviceList.restore(function () {
+            // Call functions registered using `whenLoaded()`.
+            var i,
+                l;
+            _loaded = true;
+            for (i = 0, l = _onLoad.length; i < l; i = i + 1) {
+                _onLoad[i].apply(window);
+            }
+
+            // Start watching for newly connected and disconnected devices.
+            deviceList.watch(deviceList.POLLING_PERIOD);
+        }.bind(this));
 
         // Before initialize hooks
         deviceList.registerBeforeInitHook(setupWatchPausing);
@@ -51,8 +67,16 @@ angular.module('webwalletApp')
         deviceList.registerForgetHook(onForget);
         deviceList.registerAfterForgetHook(navigateToDefaultDevice);
 
-        // Watch for newly connected and disconnected devices
-        deviceList.watch(deviceList.POLLING_PERIOD);
+        /**
+         * TODO
+         */
+        this.whenLoaded = function (callback) {
+            if (_loaded) {
+                callback();
+            } else {
+                _onLoad.push(callback);
+            }
+        };
 
         /**
          * Pause refreshing of the passed device while a communicate with the

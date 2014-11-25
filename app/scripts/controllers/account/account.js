@@ -4,7 +4,8 @@ angular.module('webwalletApp').controller('AccountCtrl', function (
     $scope,
     $location,
     $routeParams,
-    config) {
+    config,
+    metadata) {
 
     'use strict';
 
@@ -13,6 +14,8 @@ angular.module('webwalletApp').controller('AccountCtrl', function (
         $location.path('/');
         return;
     }
+
+    metadata.init($scope.device.id, $scope.account.id);
 
     $scope.blockExplorer = config.blockExplorers[config.coin];
 

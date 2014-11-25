@@ -13,13 +13,7 @@ angular.module('webwalletApp').factory('metadata', function (
      *
      * @constructor
      */
-    function Metadata() {
-        this._storage = new RemoteItemStorage(
-            config.storageVersion,
-            this.STORAGE_METADATA,
-            this.STORAGE_METADATA_VERSION
-        );
-    }
+    function Metadata() {}
 
     Metadata.prototype.STORAGE_METADATA = 'trezorMetadata';
     Metadata.prototype.STORAGE_METADATA_VERSION = 'trezorMetadataVersion';
@@ -28,6 +22,14 @@ angular.module('webwalletApp').factory('metadata', function (
     Metadata.prototype._data = null;
     Metadata.prototype._promise = null;
     Metadata.prototype._done = false;
+
+    Metadata.prototype.init = function (device, account) {
+        this._storage = new RemoteItemStorage(
+            config.storageVersion,
+            [this.STORAGE_METADATA, device, account].join('/'),
+            this.STORAGE_METADATA_VERSION
+        );
+    };
 
     Metadata.prototype._getData = function (callback) {
         var deferred;
@@ -50,8 +52,9 @@ angular.module('webwalletApp').factory('metadata', function (
         this._promise = deferred.promise;
 
         this._storage.load(function (items) {
-            this._data = items || {};
             this._done = true;
+            this._data = items || {};
+            this._storage.watch(this._data);
             callback(this._data);
             deferred.resolve(items);
         }.bind(this));

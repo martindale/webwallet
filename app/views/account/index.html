@@ -66,10 +66,20 @@
                   </span>
                 </span>
                 <span class="text-warning" ng-switch-when="self">
-                  <span class="glyphicon glyphicon-user"></span> Sent to myself
+                  <span ng-if="tx._label" title="Sent to myself">
+                    {{tx._label}}
+                  </span>
+                  <span ng-if="!tx._label">
+                    <span class="glyphicon glyphicon-user"></span> Sent to myself
+                  </span>
                 </span>
                 <span class="text-muted" ng-switch-default>
-                  <span class="glyphicon glyphicon-question-sign"></span> Unknown
+                  <span ng-if="tx._label" title="Unknown">
+                    {{tx._label}}
+                  </span>
+                  <span ng-if="!tx._label">
+                    <span class="glyphicon glyphicon-question-sign"></span> Unknown
+                  </span>
                 </span>
               </div>
             </td>

@@ -58,7 +58,11 @@
 
         RemoteItemStorage.prototype._getKey = function (client, key, callback) {
             this._loadMap(client, function (map) {
-                callback(map[key]);
+                if (map) {
+                    callback(map[key]);
+                } else {
+                    callback(map);
+                }
             });
         };
 

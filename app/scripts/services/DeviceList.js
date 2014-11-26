@@ -14,8 +14,7 @@ angular.module('webwalletApp').factory('deviceList', function (
     trezor,
     trezorApi,
     TrezorDevice,
-    LocalItemStorage,
-    $location) {
+    LocalItemStorage) {
 
     'use strict';
 
@@ -640,23 +639,6 @@ angular.module('webwalletApp').factory('deviceList', function (
         dev.disconnect();
         return $q.when(dev)
             .then(this._execHooks(this._disconnectHooks));
-    };
-
-    /**
-     * Go to the URL of passed device.
-     *
-     * Do nothing if we are already on that URL unless the `force` param
-     * is true.
-     *
-     * @param {TrezorDevice} dev  Device
-     * @param {Boolean} force     Go to device index page
-     */
-    DeviceList.prototype.navigateTo = function (dev, force) {
-        var path = '/device/' + dev.id;
-
-        if (force || $location.path().indexOf(path) !== 0) {
-            $location.path(path);
-        }
     };
 
     /**

@@ -1,9 +1,7 @@
 /*global angular*/
 
 angular.module('webwalletApp').controller('DeviceInfoCtrl', function (
-    flash,
-    $scope,
-    $location) {
+    $scope) {
 
     'use strict';
 

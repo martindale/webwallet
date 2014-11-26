@@ -23,7 +23,11 @@
  */
 angular.module('webwalletApp')
     .service('deviceService', function (
-            TrezorDevice, deviceList, $rootScope, $location) {
+            TrezorDevice,
+            deviceList,
+            routes,
+            $q,
+            $rootScope) {
 
         'use strict';
 
@@ -32,7 +36,9 @@ angular.module('webwalletApp')
             _onLoad = [],
             EVENT_ASK_FORGET = 'device.askForget',
             EVENT_ASK_DISCONNECT = 'device.askDisconnect',
-            EVENT_CLOSE_DISCONNECT = 'device.closeDisconnect';
+            EVENT_CLOSE_DISCONNECT = 'device.closeDisconnect',
+            PATH_DEVICE = '/device/', // FIXME
+            PATH_ACCOUNT = '/account/'; // FIXME
 
         this.EVENT_ASK_FORGET = EVENT_ASK_FORGET;
         this.EVENT_ASK_DISCONNECT = EVENT_ASK_DISCONNECT;
@@ -66,17 +72,6 @@ angular.module('webwalletApp')
         // Forget hooks
         deviceList.registerForgetHook(onForget);
         deviceList.registerAfterForgetHook(navigateToDefaultDevice);
-
-        /**
-         * TODO
-         */
-        this.whenLoaded = function (callback) {
-            if (_loaded) {
-                callback();
-            } else {
-                _onLoad.push(callback);
-            }
-        };
 
         /**
          * Pause refreshing of the passed device while a communicate with the
@@ -145,28 +140,68 @@ angular.module('webwalletApp')
         }
 
         /**
+         * Go to the URL of passed device.
+         *
+         * Do nothing if we are already on that URL unless the `force` param
+         * is true.
+         *
+         * @param {TrezorDevice} dev   Device
+         * @param {Boolean} force      Go to device index page
+         * @return {Promise}           Promise that is resolved after
+         *                             the redirection is complete.
+         */
+        function navigateToDevice(dev, force) {
+            var path = PATH_DEVICE + dev.id;
+
+            if (force || !routes.isUrlActive(path)) {
+                return routes.redirect(path);
+            }
+            return $q.when();
+        }
+
+        /**
+         * TODO
+         *
+         * @return {Promise}           Promise that is resolved after
+         *                             the redirection is complete.
+         */
+        function navigateToAccount(dev, acc, force) {
+            var path = PATH_DEVICE + dev.id + PATH_ACCOUNT + acc.id;
+
+            if (force || !routes.isUrlActive(path)) {
+                return routes.redirect(path);
+            }
+            return $q.when();
+        }
+
+        /**
          * Navigate to a URL of passed device if the current URL is not
          * a device URL (that means we are on the homepage).
          *
          * @param {TrezorDevice} dev  Device object
+         * @return {Promise}          Promise that is resolved after
+         *                            the redirection is complete.
          */
         function navigateToDeviceFromHomepage(dev) {
-            if ($location.path().indexOf('/device/') !== 0) {
-                deviceList.navigateTo(dev);
+            if (!routes.isUrlActive(PATH_DEVICE)) {
+                return navigateToDevice(dev);
             }
+            return $q.when();
         }
 
         /**
          * If the current URL is the URL of the device being disconnected,
          * go to the default device or to homepage if no devices are connected.
+         *
+         * @return {Promise}  Promise that is resolved after the redirection
+         *                    is complete.
          */
         function navigateToDefaultDevice() {
             var dev = deviceList.getDefault();
             if (dev) {
-                deviceList.navigateTo(dev);
-                return;
+                return navigateToDevice(dev);
             }
-            $location.path('/');
+            return routes.home();
         }
 
         /**
@@ -231,6 +266,18 @@ angular.module('webwalletApp')
             $rootScope.$broadcast(EVENT_ASK_FORGET, dev);
         }
 
+
+        /**
+         * TODO
+         */
+        this.whenLoaded = function (callback) {
+            if (_loaded) {
+                callback();
+            } else {
+                _onLoad.push(callback);
+            }
+        };
+
         /**
          * Mark that the user decided to cancel forgettin of the device by
          * cancelling the modal dialog asking him/her to disconnect the device.
@@ -240,4 +287,7 @@ angular.module('webwalletApp')
         this.forgetRequestCancelled = function () {
             _forgetRequested = false;
         };
+
+        this.navigateToDevice = navigateToDevice;
+        this.navigateToAccount = navigateToAccount;
     });

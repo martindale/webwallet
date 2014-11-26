@@ -76,9 +76,7 @@ angular.module('webwalletApp').service('utils', function Utils(
     $log,
     $http,
     $interval,
-    $timeout,
-    $location,
-    $rootScope) {
+    $timeout) {
 
     var curve = ecurve.getCurveByName('secp256k1');
 
@@ -396,30 +394,6 @@ angular.module('webwalletApp').service('utils', function Utils(
 
     this.tick = tick;
     this.endure = endure;
-
-    /**
-     * Redirect to passed path.
-     *
-     * @param {String} path  Path to redirect to
-     * @return {Promise}     Promise that is resolved after the redirection is
-     *                       complete.
-     */
-    function redirect(path) {
-        var deferred = $q.defer(),
-            off;
-        if ($location.path() !== path) {
-            $location.path(path);
-            off = $rootScope.$on('$locationChangeSuccess', function () {
-                deferred.resolve();
-                off();
-            });
-        } else {
-            deferred.resolve();
-        }
-        return deferred.promise;
-    }
-
-    this.redirect = redirect;
 
 });
 

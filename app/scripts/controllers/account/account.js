@@ -3,9 +3,9 @@
 angular.module('webwalletApp').controller('AccountCtrl', function (
     deviceService,
     $scope,
-    $location,
     $routeParams,
     config,
+    routes,
     metadata) {
 
     'use strict';
@@ -17,7 +17,7 @@ angular.module('webwalletApp').controller('AccountCtrl', function (
     deviceService.whenLoaded(function init() {
         $scope.account = $scope.device.account($routeParams.accountId);
         if (!$scope.account) {
-            $location.path('/');
+            routes.home();
             return;
         }
 
@@ -29,8 +29,10 @@ angular.module('webwalletApp').controller('AccountCtrl', function (
     $scope.hideAccount = function () {
         $scope.account.unsubscribe();
         $scope.device.hideAccount($scope.account);
-        $location.path('/device/' + $scope.device.id + '/account/'
-                       + ($scope.device.accounts.length - 1));
+        deviceService.navigateToAccount(
+            $scope.device,
+            $scope.device.accounts[$scope.device.accounts.length - 1]
+        );
     };
 
 });

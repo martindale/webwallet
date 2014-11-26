@@ -3,6 +3,7 @@
 angular.module('webwalletApp').controller('DeviceSetupCtrl', function (
     utils,
     flash,
+    deviceService,
     $scope,
     $modal) {
 
@@ -55,7 +56,7 @@ angular.module('webwalletApp').controller('DeviceSetupCtrl', function (
 
         dev.reset(set).then(
             function () {
-                utils.redirect('/device/' + dev.id).then(function () {
+                deviceService.navigateToDevice(dev).then(function () {
                     flash.success('Congratulations! Your device is now ready to use.');
                 });
             },

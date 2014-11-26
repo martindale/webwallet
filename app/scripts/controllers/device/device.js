@@ -6,10 +6,10 @@
 angular.module('webwalletApp').controller('DeviceCtrl', function (
     $modal,
     $scope,
-    $location,
     $routeParams,
     $document,
     flash,
+    routes,
     TrezorDevice,
     deviceList,
     deviceService) {
@@ -24,7 +24,7 @@ angular.module('webwalletApp').controller('DeviceCtrl', function (
     deviceService.whenLoaded(function init() {
         $scope.device = deviceList.get($routeParams.deviceId); // FIXME
         if (!$scope.device) {
-            $location.path('/');
+            routes.home();
             return;
         }
     });

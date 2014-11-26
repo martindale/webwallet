@@ -1,9 +1,10 @@
 /*global angular*/
 
 angular.module('webwalletApp').controller('DeviceWipeCtrl', function (
-    $scope,
-    flash,
     deviceList,
+    deviceService,
+    flash,
+    $scope,
     $modal) {
 
     'use strict';
@@ -33,7 +34,7 @@ angular.module('webwalletApp').controller('DeviceWipeCtrl', function (
                 .then(function () {
                     deviceList.forget(dev);
                 }, function () {
-                    deviceList.navigateTo(dev, true);
+                    deviceService.navigateToDevice(dev, true);
                 });
             deviceList.abortHook();
         }

@@ -21,8 +21,8 @@
  */
 angular.module('webwalletApp').factory('uriRedirect', function (
     deviceList,
-    $route,
-    $location) {
+    routes,
+    $route) {
 
     'use strict';
 
@@ -33,7 +33,7 @@ angular.module('webwalletApp').factory('uriRedirect', function (
         null,
         '/send/',
         null
-    ],
+    ], // FIXME
         PATH_SEND_PATTERN_AMOUNT = [
             '/amount/',
             null
@@ -105,13 +105,13 @@ angular.module('webwalletApp').factory('uriRedirect', function (
     device = deviceList.getDefault(); // FIXME
     if (!device) {
         console.warn('[uri] Failed to find default device.  No redirect to Send will be made.');
-        $location.path('/');
+        routes.home();
         return;
     }
     account = device.getDefaultAccount();
     if (!account) {
         console.warn('[uri] Failed to find default account.  No redirect to Send will be made.');
-        $location.path('/');
+        routes.home();
         return;
     }
 
@@ -130,5 +130,5 @@ angular.module('webwalletApp').factory('uriRedirect', function (
 
     // Redirect.
     console.log('[uri] redirecting to ' + redirectUri);
-    $location.path(redirectUri).replace();
+    routes.replace(redirectUri);
 });

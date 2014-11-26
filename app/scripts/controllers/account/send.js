@@ -391,7 +391,7 @@ angular.module('webwalletApp').controller('AccountSendCtrl', function (
                 $scope.sending = false;
 
                 redirectUrl = ['/device/', $scope.device.id, '/account/',
-                    $scope.account.id].join('');
+                    $scope.account.id].join(''); // FIXME
 
                 utils.redirect(redirectUrl).then(function () {
                     res.hashRev = res.hash.slice();

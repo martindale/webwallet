@@ -3,8 +3,8 @@
 angular.module('webwalletApp').controller('DeviceRecoveryCtrl', function (
     bip39,
     flash,
-    $scope,
-    $location) {
+    deviceService,
+    $scope) {
 
     'use strict';
 
@@ -31,7 +31,7 @@ angular.module('webwalletApp').controller('DeviceRecoveryCtrl', function (
         $scope.device.recover($scope.settings).then(
             function () {
                 $scope.recovering = false;
-                $location.path('/device/' + $scope.device.id);
+                deviceService.navigateToDevice($scope.device);
             },
             function (err) {
                 $scope.recovering = false;

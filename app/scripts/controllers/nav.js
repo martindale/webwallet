@@ -8,10 +8,11 @@
  * @see  nav.html
  */
 angular.module('webwalletApp').controller('NavCtrl', function (
-    $scope,
-    $location,
     deviceList,
-    flash) {
+    deviceService,
+    flash,
+    routes,
+    $scope) {
 
     'use strict';
 
@@ -20,7 +21,7 @@ angular.module('webwalletApp').controller('NavCtrl', function (
     };
 
     $scope.isActive = function (path) {
-        return $location.path().match(path);
+        return routes.isUrlActive(path);
     };
 
     $scope.addingInProgress = false;
@@ -29,7 +30,7 @@ angular.module('webwalletApp').controller('NavCtrl', function (
         $scope.addingInProgress = true;
         dev.addAccount().then(
             function (acc) {
-                $location.path('/device/' + dev.id + '/account/' + acc.id);
+                deviceService.navigateToAccount(dev, acc);
                 $scope.addingInProgress = false;
             },
             function (err) {
@@ -39,7 +40,7 @@ angular.module('webwalletApp').controller('NavCtrl', function (
     };
 
     $scope.accountLink = function (dev, acc) {
-        var link = '#/device/' + dev.id + '/account/' + acc.id;
+        var link = '#/device/' + dev.id + '/account/' + acc.id; // FIXME
         if ($scope.isActive('/receive$')) link += '/receive';
         if ($scope.isActive('/send$')) link += '/send';
         return link;

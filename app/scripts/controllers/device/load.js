@@ -2,8 +2,8 @@
 
 angular.module('webwalletApp').controller('DeviceLoadCtrl', function (
     flash,
-    $scope,
-    $location) {
+    deviceService,
+    $scope) {
 
     'use strict';
 
@@ -20,8 +20,12 @@ angular.module('webwalletApp').controller('DeviceLoadCtrl', function (
         set.payload = set.payload.trim();
 
         dev.load(set).then(
-            function () { $location.path('/device/' + dev.id); },
-            function (err) { flash.error(err.message || 'Importing failed'); }
+            function () {
+                deviceService.navigateToDevice(dev);
+            },
+            function (err) {
+                flash.error(err.message || 'Importing failed');
+            }
         );
     };
 

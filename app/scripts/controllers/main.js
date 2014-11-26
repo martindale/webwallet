@@ -19,5 +19,5 @@ angular.module('webwalletApp').controller('MainCtrl', function (
 
     $scope.isConnected = function () {
         return deviceList.count() !== 0;
-    }
+    };
 });

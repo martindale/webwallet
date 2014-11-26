@@ -26,7 +26,7 @@ angular.module('webwalletApp').factory('metadata', function (
     Metadata.prototype.init = function (device, account) {
         this._storage = new RemoteItemStorage(
             config.storageVersion,
-            [this.STORAGE_METADATA, device, account].join('/'),
+            [this.STORAGE_METADATA, device, account, ''].join('/'),
             this.STORAGE_METADATA_VERSION
         );
     };
@@ -70,42 +70,61 @@ angular.module('webwalletApp').factory('metadata', function (
         }.bind(this));
     };
 
-    Metadata.prototype.getAllAddressLabels = function (callback) {
+    Metadata.prototype._getLabel = function (key, callback) {
         this._getData(function (data) {
-            if (data && data.addresses) {
-                callback(_.clone(data.addresses));
+            if (data) {
+                callback(data[key]);
+            } else {
+                callback(undefined);
             }
         });
     };
 
     Metadata.prototype.getAddressLabel = function (addr, callback) {
+        this._getLabel(addr, callback);
+    };
+
+    Metadata.prototype.getOutputLabel = function (txHash, index, callback) {
+        this._getLabel(txHash + index, callback);
+    };
+
+    Metadata.prototype.getTxLabel = function (txHash, callback) {
+        this._getLabel(txHash, callback);
+    };
+
+    Metadata.prototype._setLabel = function (key, label) {
         this._getData(function (data) {
-            if (data && data.addresses) {
-                callback(data.addresses[addr]);
+            if (label !== null && label !== undefined) {
+                data[key] = label;
+            } else if (data[key]) {
+                delete data[key];
             }
         });
     };
 
     Metadata.prototype.setAddressLabel = function (addr, label) {
+        this._setLabel(addr, label);
+    };
+
+    Metadata.prototype.getOutputLabel = function (txHash, index, label) {
+        this._setLabel(txHash + index, label);
+    };
+
+    Metadata.prototype.getTxLabel = function (txHash, label) {
+        this._setLabel(txHash, label);
+    };
+
+    Metadata.prototype._getAllLabels = function (callback) {
         this._getData(function (data) {
-            if (!data.addresses || typeof data.addresses !== 'object') {
-                data.addresses = {};
-            }
-            if (label !== null && label !== undefined) {
-                data.addresses[addr] = label;
-            } else if (data.addresses[addr]) {
-                delete data.addresses[addr];
+            if (data) {
+                callback(_.clone(data));
+            } else {
+                callback({});
             }
         });
     };
 
-    Metadata.prototype.getOutputLabel = function (txHash, index, callback) {
-        throw new Error('Not implemented yet.');
-    };
-
-    Metadata.prototype.getTxLabel = function (txHash, callback) {
-        throw new Error('Not implemented yet.');
-    };
+    Metadata.prototype.getAllAddressLabels = Metadata.prototype._getAllLabels;
 
     return new Metadata();
 

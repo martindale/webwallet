@@ -3,8 +3,7 @@
 angular.module('webwalletApp').service('routes', function (
     $q,
     $location,
-    $rootScope,
-    routesSearch) {
+    $rootScope) {
 
     'use strict';
 
@@ -24,7 +23,7 @@ angular.module('webwalletApp').service('routes', function (
                 return $q.when();
             }
             deferred = $q.defer();
-            this._redirectWithSearch(path);
+            this._redirect(path);
             off = $rootScope.$on('$locationChangeSuccess', function () {
                 deferred.resolve();
                 off();
@@ -36,14 +35,14 @@ angular.module('webwalletApp').service('routes', function (
          * TODO
          */
         replace: function (path) {
-            this._redirectWithSearch(path).replace();
+            this._redirect(path).replace();
         },
 
         /**
          * TODO
          */
         home: function () {
-            this._redirectWithSearch('/');
+            this._redirect('/');
         },
 
         /**
@@ -56,11 +55,8 @@ angular.module('webwalletApp').service('routes', function (
         /**
          * TODO
          */
-        _redirectWithSearch: function (path) {
-            console.log('[routes] go to', path, routesSearch);
-            if (routesSearch) {
-                return $location.path(path + '?_&' + routesSearch);
-            }
+        _redirect: function (path) {
+            console.log('[routes] go to', path);
             return $location.path(path);
         }
     };

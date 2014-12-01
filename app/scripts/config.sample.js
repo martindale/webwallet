@@ -92,6 +92,8 @@ angular.module('webwalletApp').constant('config', {
     }
   },
 
-  useBip44: true
+  useBip44: true,
+
+  dropboxApiKey: 'yourDropboxDeveloperKeyGoesHere'
 
 });
